@@ -1,0 +1,48 @@
+<div class="flex flex-row gap-3 ">
+  <div class="relative">
+    <div *ngIf="stateService.sidebarVisible" class="shadow-md px-3 py-2 sticky w-80 top-20 sidebar"
+      style="background-color: var(--surface-c)">
+      <ul class="list-none m-0 p-0 capitalize" *ngFor="let menuItem of menuItems">
+        <li>
+          <div pRipple class="m-0 mb-1 p-3 menuItem" *ngIf="menuItem?.subMenu?.length! <= 0"
+            [routerLink]="menuItem?.routerLink" routerLinkActive="menuItem_active">
+            <i class="{{ menuItem?.icon }} mx-2"></i>
+            <span class="font-semibold capitalize">{{ menuItem.title |translate }}</span>
+          </div>
+          <div *ngIf="menuItem?.subMenu?.length! > 0">
+            <div pRipple pStyleClass="@next" enterClass="hidden" enterActiveClass="slidedown" leaveToClass="hidden"
+              leaveActiveClass="slideup" class="p-3 flex align-items-center justify-content-between menuItem mb-1"
+              (click)="toggleSubMenu(menuItem.id!)" [routerLink]="menuItem?.routerLink"
+              routerLinkActive="menuItem_active">
+
+              <span class="font-semibold capitalize"> <i class="{{ menuItem?.icon }} mx-2"></i>{{ menuItem.title
+                |translate
+                }}</span>
+              <i class="pi" [ngClass]="{
+                  'pi-chevron-down': isSubMenuOpen[menuItem.id!],
+                  'pi-chevron-up': !isSubMenuOpen[menuItem.id!]
+                }"></i>
+            </div>
+            <ul class="list-none px-3 m-0 overflow-hidden py-1">
+              <div pRipple class="font-semibold p-3 subMenuItem my-1" *ngFor="let smi of menuItem.subMenu"
+                routerLinkActive="subMenuItem_active" [routerLink]="smi?.routerLink">
+                <i class="{{ smi?.icon }} mx-2"></i>
+                {{ smi.title |translate }}
+              </div>
+            </ul>
+          </div>
+        </li>
+      </ul>
+      <div class="absolute bottom-0 left-0 right-0 p-3">
+        <div pRipple class="m-0 mb-1 p-3 menuItem" (click)="logout()">
+          <i class="pi pi-sign-out mx-2"></i>
+          <span class="font-semibold capitalize">{{"logout" | translate}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full">
+    <router-outlet></router-outlet>
+  </div>
+</div>

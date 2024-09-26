@@ -1,0 +1,9 @@
+<div
+  [ngClass]="{
+    'ui-rtl': cls.currentDirection() === 'rtl',
+    'ui-ltr': cls.currentDirection() === 'ltr'
+  }"
+  [dir]="cls.currentDirection()"
+>
+  <router-outlet></router-outlet>
+</div>

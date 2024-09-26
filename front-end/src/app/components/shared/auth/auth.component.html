@@ -1,0 +1,35 @@
+<div class="grid grid-nogutter surface-section h-screen">
+  <div class="col-12 hidden md:block md:col-5 overflow-hidden">
+    <img src="../../../../assets/images/auth.webp" alt="Image" class="md:mx-0 block md:h-screen w-full" />
+  </div>
+  <div class="col-12 md:col-7 text-left flex flex-col justify-center align-items-center">
+    <div class="justify-center text-center">
+      <img src="assets/images/2.png" alt="Image" height="50" class="mb-3" />
+      <div class="text-3xl text-primary font-medium mb-3 capitalize">
+        {{ "login" | translate }}
+      </div>
+      <div class="my-2 text-primary">
+        <span class="cursor-pointer" *ngIf="changelangService.currentLang() !== 'en'"
+          (click)="changeLang('en')">English</span>
+        <span class="cursor-pointer" *ngIf="changelangService.currentLang() !== 'ar'"
+          (click)="changeLang('ar')">العربية</span>
+      </div>
+    </div>
+
+    <form #form="ngForm">
+      <label for="username" class=" text-900 text-xl font-medium mb-2 capitalize ">{{ "username" | translate
+        }}</label>
+      <input id="username" name="username" type="username" [placeholder]="'username' | translate" pInputText
+        class="w-full mb-5 p-3" [(ngModel)]="username" required />
+      <label for="password" class=" text-900 font-medium text-xl mb-2 capitalize ">{{ "password" | translate
+        }}</label>
+      <input id="password" name="password" type="password" [placeholder]="'password' | translate" pInputText
+        class="w-full mb-5 p-3" [(ngModel)]="password" required />
+
+      <button pButton pRipple loadingIcon="pi pi-spin pi-spinner " [loading]="loading" [label]="'login' | translate"
+        class="w-full text-xl capitalize " (click)="login()" [disabled]="loading"></button>
+    </form>
+  </div>
+</div>
+
+<p-toast position="bottom-center"></p-toast>

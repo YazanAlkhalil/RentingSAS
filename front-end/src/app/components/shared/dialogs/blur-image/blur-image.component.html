@@ -1,0 +1,21 @@
+<div class="flex justify-center items-center">
+  <img class="border-none p-0 shadow-md " [ngClass]="{
+        imagehidden: imageNotLoaded,
+        imageLoaded: !imageNotLoaded,
+       }" (load)="imageNotLoaded = false" [ngStyle]="{
+      'width.px': !imageNotLoaded ? width : 0,
+      'height.px': !imageNotLoaded ? height : 0,
+     }" [ngStyle]="{}" [src]="
+      image ? imgResultAfterCompress || image.get('image')?.url() : defImagePath
+    " />
+  <img class="blur border-none p-0  " [ngClass]="{
+        imagehidden: !imageNotLoaded,
+        imageLoaded: imageNotLoaded,
+      }" [ngStyle]="{
+      'width.px': imageNotLoaded ? width : 0,
+      'height.px': imageNotLoaded ? height : 0,
+     }" [src]="
+      sharedService.loaderString +
+      (image && image.get('loaderData') ? image.get('loaderData') : '')
+    " />
+</div>

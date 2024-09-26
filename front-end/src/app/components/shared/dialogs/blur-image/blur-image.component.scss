@@ -1,0 +1,24 @@
+.imagehidden {
+    visibility: hidden;
+    width: 0;
+    height: 0;
+    padding: 2px;
+  }
+  
+  .imageLoaded {
+    border-radius: 10px;
+    border-width: 1px;
+    border-style: solid;
+    padding: 2px;
+    margin-top: 5px;
+  }
+  
+  .blur {
+    filter: blur(15px);
+    -moz-filter: blur(15px);
+    -o-filter: blur(15px);
+    -ms-filter: blur(15px);
+    padding: 2px;
+    margin-top: 5px;
+  }
+  

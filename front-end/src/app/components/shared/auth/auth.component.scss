@@ -1,0 +1,15 @@
+.surface-card-container {
+    position: absolute;
+    z-index: 1;
+    backdrop-filter: blur(28px);
+    border-radius: 53px;
+}
+
+.surface-card-overlay {
+    position: relative;
+}
+
+.surface-ground {
+    background: rgb(93, 93, 92);
+    background: linear-gradient(90deg, rgb(142, 142, 142) 0%, rgba(252, 244, 244, 0.972) 48%, rgba(255, 149, 0, 0.732) 100%);
+}
