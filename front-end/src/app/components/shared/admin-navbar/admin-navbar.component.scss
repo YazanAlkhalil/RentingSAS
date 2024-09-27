@@ -1,0 +1,10 @@
+.bar {
+  border-radius: 0px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.sticky {
+  backdrop-filter: blur(18px) !important;
+  z-index: 1;
+}

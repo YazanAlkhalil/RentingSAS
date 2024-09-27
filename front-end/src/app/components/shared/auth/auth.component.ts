@@ -62,15 +62,11 @@ export class AuthComponent {
     this.authService
       .logIn(this.username.trim(), this.password.trim())
       .then(async (user: User) => {
-        // const session = await Session.current();
-        // Cloud.run("setSessionInfo", {
-        //   isBrowser: this.platform.isBrowser,
-        //   android: this.platform.ANDROID,
-        //   ios: this.platform.IOS,
-        //   broswer: this.getBrowserName(),
-        //   installationId: session.get("installationId"),
-        // });
-        this.router.navigate(["main"]);
+        if(await this.authService.isAdmin()){
+          this.router.navigate(['/admin']);
+        }else{
+          this.router.navigate(['/main']);
+        }
         this.loading = false;
         this.cd.detectChanges();
       })

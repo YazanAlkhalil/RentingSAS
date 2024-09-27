@@ -2,6 +2,8 @@ import { Routes } from "@angular/router";
 import { AppComponent } from "./app.component";
 import { authGuard } from "./services/guards/auth.guard";
 import { AuthComponent } from "./components/shared/auth/auth.component";
+import { AdminLayoutComponent } from "./components/layouts/admin-layout/admin-layout.component";
+import { adminGuard } from "./services/guards/admin.guard";
 
 export const routes: Routes = [
   {
@@ -10,11 +12,18 @@ export const routes: Routes = [
     children: [
       {
         path: "login",
-        component: AuthComponent,
-        // loadComponent: () =>
-        //   import("./components/shared/auth/auth.component").then(
-        //     (m) => m.AuthComponent
-        //   ),
+        loadComponent: () =>
+          import("./components/shared/auth/auth.component").then(
+            (m) => m.AuthComponent
+          ),
+      },
+      {
+        path: "admin",
+        loadComponent: () =>
+          import("./components/layouts/admin-layout/admin-layout.component").then(
+            (m) => m.AdminLayoutComponent
+          ),
+        canActivate: [adminGuard],
       },
       {
         path: "main",

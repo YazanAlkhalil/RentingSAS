@@ -1,0 +1,97 @@
+<div
+  class="px-4 shadow-md sticky z-20 top-0 blur-3xl bg-transparent bg-opacity-10 flex-nowrap h-20 flex items-center justify-between"
+>
+  <div class="flex gap-5 items-center">
+    <img
+      src="../../../../assets/images/logo.webp"
+      styleClass=" my-2 "
+      height="40"
+      class="rounded-md"
+    />
+    <p class="text-xl font-bold mx-0">{{ "Admin Dashboard" | translate }}</p>
+  </div>
+
+  <div class="flex gap-5 items-center">
+    
+    <p-button
+      pRipple
+      [outlined]="false"
+      severity="secondary"
+      [rounded]="true"
+      [text]="true"
+      class="font-medium cursor-pointer"
+      icon="pi pi-language"
+      (click)="toggleLang()"
+      size="large"
+    >
+    </p-button>
+    <p-button
+      pRipple
+      [outlined]="false"
+      severity="secondary"
+      [rounded]="true"
+      [text]="true"
+      (click)="swwitchTheme('dark')"
+      *ngIf="currentTheme === 'light'"
+      icon="pi pi-moon"
+      size="large"
+      styleClass="fa-xl cursor-pointer m-0"
+    >
+    </p-button>
+    <p-button
+      pRipple
+      [outlined]="false"
+      severity="secondary"
+      [rounded]="true"
+      [text]="true"
+      icon="pi pi-sun"
+      size="large"
+      styleClass="fa-xl cursor-pointer"
+      (click)="swwitchTheme('light')"
+      *ngIf="currentTheme === 'dark'"
+    >
+    </p-button>
+    <app-blur-image
+      [image]="authService.getCurrentUser()?.get('profilePic')"
+      [height]="40"
+      class="mb-2 border-r-8"
+    ></app-blur-image>
+    <div pRipple class="m-0 mb-1 p-3 menuItem" (click)="logout()">
+      <i class="pi pi-sign-out mx-2 hover:cursor-pointer" style="font-size: 1.5rem"></i>
+      <!-- <span class="font-semibold capitalize">{{"logout" | translate}}</span> -->
+    </div>
+  </div>
+</div>
+<div class="card flex justify-content-center">
+  <p-confirmDialog #cd>
+    <ng-template pTemplate="headless" let-message>
+      <div
+        class="flex flex-column align-items-center p-5 surface-overlay border-round"
+      >
+        <div
+          class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem -mt-8"
+        >
+          <i class="pi pi-question text-5xl"></i>
+        </div>
+        <span class="font-bold text-2xl block mb-2 mt-4">{{
+          message.header
+        }}</span>
+        <p class="mb-0">{{ message.message }}</p>
+        <div class="flex align-items-center gap-2 mt-4">
+          <button
+            pButton
+            label="{{ 'Yes' | translate }}"
+            (click)="cd.accept()"
+            class="w-8rem"
+          ></button>
+          <button
+            pButton
+            label="{{ 'No' | translate }}"
+            (click)="cd.reject()"
+            class="p-button-outlined w-8rem"
+          ></button>
+        </div>
+      </div>
+    </ng-template>
+  </p-confirmDialog>
+</div>
