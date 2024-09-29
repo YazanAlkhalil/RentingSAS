@@ -51,6 +51,12 @@ export const routes: Routes = [
                   (m) => m.BuildingsComponent
                 )
             },
+            {
+              path:'users',
+              loadComponent: () => 
+                import('./pages/users/users.component')
+              .then( (m) => m.UsersComponent )
+            }
           ]
       },
       {
