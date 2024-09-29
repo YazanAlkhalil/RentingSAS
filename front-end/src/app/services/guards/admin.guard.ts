@@ -10,5 +10,7 @@ export const adminGuard: CanActivateChildFn = async (childRoute, state) => {
   if (await authService.isAdmin()) {
     return true;
   }
+  console.log("admin guard");
+  
   return router.createUrlTree(["login"]);
 };
