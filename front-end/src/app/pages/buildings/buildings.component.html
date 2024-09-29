@@ -1,64 +1,18 @@
-<div class="mx-12 my-3 p-4" style="background-color: var(--surface-c)">
-  <div
-    class="flex align-items-start flex-column lg:justify-content-between lg:flex-row"
-  >
-    <div class="font-semibold text-3xl text-900 capitalize px-2">
-      {{ "buildings" | translate }}
-    </div>
-    <div class="font-semibold text-2xl text-900 capitalize px-2">
-      {{ objects.count }}
-    </div>
-  </div>
-</div>
-
-<div class="flex flex-col justify-start mx-12">
-  <p-toolbar styleClass="mb-2 " [style]="{ 'border-radius': '0' }">
-    <ng-template pTemplate="left">
-      <div class="flex flex-col gap-2">
-        <div class="my-2 flex gap-2 items-center">
+<div class="card">
+  <p-toast />
+  <p-toolbar styleClass="mb-4 gap-2">
+      <ng-template pTemplate="left">
           <p-button
-            (click)="add()"
-            severity="success"
-            pRipple
-            ButtonIconPosition="right"
-          >
-            <ng-template pTemplate="content">
-              <div class="flex items-center gap-2">
-                <span class="pi pi-plus"></span>
-                <span class="md:block hidden font-semibold">{{
-                  "add" | translate
-                }}</span>
-              </div>
-            </ng-template>
-          </p-button>
+              severity="success" 
+              label="New" 
+              icon="pi pi-plus" 
+              class="mr-2" 
+              (onClick)="openNew()" />
           <p-button
-            (click)="refresh()"
-            severity="secondary"
-            pRipple
-            ButtonIconPosition="right"
-          >
-            <ng-template pTemplate="content">
-              <div class="flex items-center gap-2">
-                <span class="pi pi-refresh"></span>
-                <span class="md:block hidden font-semibold">{{
-                  "refresh" | translate
-                }}</span>
-              </div>
-            </ng-template>
-          </p-button>
-        </div>
-      </div>
-    </ng-template>
-    <ng-template pTemplate="right">
-      <span class="p-input-icon-left">
-        <i class="pi pi-search"></i>
-        <input
-          #searchInput
-          pInputText
-          type="text"
-          [placeholder]="'search' | translate"
-          [(ngModel)]="searchValue"
-        />
-      </span>
-    </ng-template>
+              severity="danger" 
+              label="Delete" 
+              icon="pi pi-trash" 
+              (onClick)="deleteSelectedBuildings()" 
+              [disabled]="!selectedBuildings || !selectedBuildings.length" />
+      </ng-template>
   </p-toolbar>
