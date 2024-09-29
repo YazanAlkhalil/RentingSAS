@@ -1,4 +1,4 @@
-class Report extends Parse.Object {
+export class Report extends Parse.Object {
   constructor() {
     super('Report');
   }

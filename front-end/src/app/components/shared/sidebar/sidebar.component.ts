@@ -51,16 +51,10 @@ export class SidebarComponent implements OnInit {
   loading = false;
   menuItems: CustomMenuItem[] = [
     {
-      id: "posts",
-      title: this.translateService.instant("posts"),
+      id: "buildings",
+      title: this.translateService.instant("buildings"),
       icon: "pi pi-credit-card",
-      routerLink: "/main/posts",
-    },
-    {
-      id: "sources",
-      icon: "pi pi-question-circle",
-      title: this.translateService.instant("sources"),
-      routerLink: "/main/sources",
+      routerLink: "/main/buildings",
     },
     {
       id: "users",
@@ -69,61 +63,10 @@ export class SidebarComponent implements OnInit {
       routerLink: "/main/users",
     },
     {
-      id: "admins",
-      icon: "pi pi-verified",
-      title: this.translateService.instant("admins"),
-      routerLink: "/main/admins",
-    },
-    {
-      id: "categories",
-      icon: "pi pi-box",
-      title: this.translateService.instant("categories"),
-      // routerLink: "/main/categories",
-      subMenu: [
-        {
-          title: this.translateService.instant("domains"),
-          icon: "pi pi-hashtag",
-          routerLink: "/main/domains",
-        },
-        {
-          title: this.translateService.instant("topics"),
-          icon: "pi pi-globe",
-          routerLink: "/main/topics",
-        },
-        {
-          title: this.translateService.instant("post_type"),
-          icon: "pi pi-paperclip",
-          routerLink: "/main/post_type",
-        },
-        // {
-        //   title: "Tags",
-        //   routerLink: "/main/tags",
-        // },
-      ],
-    },
-    {
-      id: "policy",
-      icon: "pi pi-verified",
-      title: this.translateService.instant("privacy policy"),
-      routerLink: "/main/policy",
-    },
-    {
-      id: "about",
-      icon: "pi pi-info-circle",
-      title: this.translateService.instant("about us"),
-      routerLink: "/main/about",
-    },
-    {
-      id: "config",
-      icon: "pi pi-cog",
-      title: this.translateService.instant("configs"),
-      routerLink: "/main/config",
-    },
-    {
-      id:"statistic",
+      id:"reports",
       icon:'pi pi-chart-line',
-      title:this.translateService.instant('statistics'),
-      routerLink: "/main/statistics"
+      title:this.translateService.instant('reports'),
+      routerLink: "/main/reports"
     }
   ];
 

@@ -33,6 +33,15 @@ export const routes: Routes = [
           import("./components/layouts/main-layout/main-layout.component").then(
             (m) => m.MainLayoutComponent
           ),
+          children:[
+            {
+              path:"buildings",
+              loadComponent: () => 
+                import('./pages/buildings/buildings.component').then(
+                  (m) => m.BuildingsComponent
+                )
+            },
+          ]
       },
       {
         path: "**",

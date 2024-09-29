@@ -1,7 +1,7 @@
 import { ContactInfo } from "./Interfaces/ContactInfo";
 
 
-class Company extends Parse.Object {
+export class Company extends Parse.Object {
   constructor() {
     super('Company');
   }
