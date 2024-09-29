@@ -1,9 +1,11 @@
 import { ContactInfo } from "./Interfaces/ContactInfo";
-
+import  Parse  from "parse";
 
 export class Company extends Parse.Object {
   constructor() {
     super('Company');
+    // Initialize contactInfo with an object that conforms to the ContactInfo interface
+    this.set('contactInfo', { phone: '', email: '' });
   }
 
   get name(): string {

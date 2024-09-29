@@ -24,6 +24,16 @@ export const routes: Routes = [
             (m) => m.AdminLayoutComponent
           ),
         canActivate: [adminGuard],
+        canActivateChild: [adminGuard],
+        children:[
+            {
+              path:"",
+              loadComponent: () => 
+                import('./components/table/table.component').then(
+                  (m) => m.TableComponent
+                )
+            },
+          ]
       },
       {
         path: "main",
