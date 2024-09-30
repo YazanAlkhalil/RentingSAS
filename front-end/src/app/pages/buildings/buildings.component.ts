@@ -69,7 +69,7 @@ export class BuildingsComponent {
     searchValue: "",
     sortField: "name",
     withCount: true,
-    company_id: this.authService.getCurrentUser()?.get(""),
+    company_id: this.authService.getCurrentUser()?.get("company_id"),
   };
   constructor(
     private buildingService: BuildingService,
