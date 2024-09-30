@@ -1,4 +1,5 @@
 export interface Apartment {
+    _id: string;
     number: string;
     floor: number;
     size: string;
@@ -8,6 +9,6 @@ export interface Apartment {
     isFurnished: boolean;
     status: string;
     description: string;
-    img: string[];
+    img: Parse.File[];
     rentPrice: string;
   }

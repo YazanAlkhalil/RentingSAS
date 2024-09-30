@@ -233,10 +233,7 @@ export class TableComponent implements OnInit {
   }
 
   getUsers() {
-    // Implement the logic to fetch users associated with the selected company
-    // You can use the AdminService to make the necessary API call
-    // Example:
-    this.adminService.getUsersByCompany(this.selectedCompany.id)
+    this.adminService.getUsersByCompany(this.selectedCompany.toPointer())
       .then(users => {
         this.users = users;
         console.log(this.users);
@@ -259,7 +256,9 @@ export class TableComponent implements OnInit {
   }
 
   saveUser() {
-    this.newUser.set('company_id', this.selectedCompany.id);
+    const company = new Company()
+    company.id = this.selectedCompany.id
+    this.newUser.set('company_id', company);
     console.log(this.newUser);
     
     this.adminService.addUser(this.newUser)

@@ -1,6 +1,6 @@
 import { Apartment } from "./Interfaces/Apartment";
 import { Location } from "./Interfaces/Location";
-class Building extends Parse.Object {
+export class Building extends Parse.Object {
   constructor() {
     super('Building');
   }

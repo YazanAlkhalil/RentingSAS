@@ -2,7 +2,7 @@ import { Client } from "./Interfaces/Client";
 import { Payment } from "./Interfaces/Payment";
 
 
-class Contract extends Parse.Object {
+export class Contract extends Parse.Object {
   constructor() {
     super('Contract');
   }
