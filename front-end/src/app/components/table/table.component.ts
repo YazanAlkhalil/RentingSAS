@@ -19,11 +19,17 @@ import { FormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { Company } from '../../models/Company';
 import { AdminService } from '../../services/dataServices/admin.service';
+import { ImageModule } from 'primeng/image';
+import Parse from 'parse';
+import { ParseError } from '@angular/compiler';
+import { User } from '../../models/_User';
+import { parse } from '@fortawesome/fontawesome-svg-core';
+import { AvatarModule } from 'primeng/avatar';
 
 @Component({
   selector: 'app-table',
   standalone: true,
-  imports: [TableModule, DialogModule, RippleModule, ButtonModule, ToastModule, ToolbarModule, ConfirmDialogModule, InputTextModule, InputTextareaModule, CommonModule, FileUploadModule, DropdownModule, TagModule, RadioButtonModule, RatingModule, InputTextModule, FormsModule, InputNumberModule],
+  imports: [TableModule, DialogModule, RippleModule, ButtonModule, ToastModule, ToolbarModule, ConfirmDialogModule, InputTextModule, InputTextareaModule, CommonModule, FileUploadModule, DropdownModule, TagModule, RadioButtonModule, RatingModule, InputTextModule, FormsModule, InputNumberModule, ImageModule, AvatarModule],
   providers: [MessageService, ConfirmationService, AdminService],
   templateUrl: './table.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -34,12 +40,17 @@ export class TableComponent implements OnInit {
   company!: Company;
   selectedCompanies: Company[] = [];
   submitted: boolean = false;
+  userDialog: boolean = false;
+  users: Parse.User[] = [];
+  selectedCompany!: Company;
+  addUserDialog: boolean = false;
+  newUser: User = new User();
 
   constructor(
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private adminService: AdminService,
-    private cd:ChangeDetectorRef
+    private cd: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -117,7 +128,7 @@ export class TableComponent implements OnInit {
   }
 
   editCompany(company: Company) {
-    this.company = { ...company } as Company;
+    this.company = company;
     this.companyDialog = true;
   }
 
@@ -150,27 +161,34 @@ export class TableComponent implements OnInit {
     this.submitted = false;
   }
 
-  saveCompany() {
+  async saveCompany() {
     this.submitted = true;
-
+    
     if (this.company.name?.trim()) {
       if (this.company.id) {
         // Update existing company
         this.companies[this.findIndexById(this.company.id)] = this.company;
+        await this.company.save()
         this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Company Updated', life: 3000 });
       } else {
+        try {
+          
+          await this.adminService.addCompany({
+            name: this.company.name,
+            address: this.company.address,
+            contactInfo: this.company.contactInfo,
+            img: this.company.img,
+            skip: 0,
+            limit: 10
+          }).then(company => {
+            this.companies.push(company);
+            this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Company Created', life: 3000 });
+          });
+        } catch (error: ParseError | any) {
+          console.log(error);
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: error.message, life: 3000 });
+        }
         // Create new company
-        this.adminService.addCompany({
-          name: this.company.name,
-          address: this.company.address,
-          contactInfo: this.company.contactInfo,
-          img: this.company.img,
-          skip: 0,
-          limit: 10
-        }).then(company => {
-          this.companies.push(company);
-          this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Company Created', life: 3000 });
-        });
       }
 
       this.companies = [...this.companies];
@@ -201,12 +219,78 @@ export class TableComponent implements OnInit {
     // }
   }
 
-  onImageUpload(event: any) {
+  onImageUpload(event: any) {    
     const file = event.files[0];
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.company.img = e.target.result;
-    };
-    reader.readAsDataURL(file);
+    const parseFile = new Parse.File(file.name, file);
+    this.company.img = parseFile;
+    
+  }
+
+  manageUsers(company: Company) {
+    this.selectedCompany = company;
+    this.getUsers();
+    this.userDialog = true;
+  }
+
+  getUsers() {
+    // Implement the logic to fetch users associated with the selected company
+    // You can use the AdminService to make the necessary API call
+    // Example:
+    this.adminService.getUsersByCompany(this.selectedCompany.id)
+      .then(users => {
+        this.users = users;
+        console.log(this.users);
+        
+        this.cd.detectChanges();
+      });
+  }
+
+  
+
+  openAddUserDialog() {
+    this.newUser = new User();
+    this.addUserDialog = true;
+  }
+
+  hideAddUserDialog() {
+    this.addUserDialog = false;
+  }
+
+  saveUser() {
+    this.newUser.set('company_id', this.selectedCompany.id);
+    console.log(this.newUser);
+    
+    this.adminService.addUser(this.newUser)
+      .then(user => {
+        this.users.push(user);        
+        this.cd.detectChanges();
+        this.addUserDialog = false;
+        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'User Added', life: 3000 });
+      })
+      .catch(error => {
+        console.error('Error adding user:', error);
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to add user', life: 3000 });
+      });
+  }
+
+  editUser(user: User) {
+    this.adminService.updateUser(user)
+      .then(() => {
+        this.getUsers();
+      });
+  }
+
+  deleteUser(user: User) {
+
+    this.adminService.deleteUser(user)
+      .then(() => {
+        this.getUsers();
+      });
+  }
+
+  onUserImageUpload(event: any) {
+    const file = event.files[0];
+    const parseFile = new Parse.File(file.name, file);
+    this.newUser.img = parseFile;
   }
 }

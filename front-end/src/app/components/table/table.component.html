@@ -6,21 +6,16 @@
             <p-button severity="danger" label="Delete" icon="pi pi-trash" (onClick)="deleteSelectedCompanies()"
                 [disabled]="!selectedCompanies || !selectedCompanies.length" />
         </ng-template>
-
-        <ng-template pTemplate="right">
-            <p-fileUpload mode="basic" accept="image/*" [maxFileSize]="1000000" label="Import" chooseLabel="Import"
-                class="mr-2 inline-block" />
-            <p-button severity="help" label="Export" icon="pi pi-upload" />
-        </ng-template>
     </p-toolbar>
 
     <p-table #dt [value]="companies" [rows]="10" [paginator]="true"
-        [globalFilterFields]="['name', 'country.name', 'representative.name', 'status']"
-        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="selectedCompanies" [rowHover]="true" dataKey="id"
+        [globalFilterFields]="['name', 'address', 'contactInfo.phone', 'contactInfo.email']"
+        [rowsPerPageOptions]="[10, 25, 50, 100]" [tableStyle]="{ 'min-width': '75rem' }"
+        [(selection)]="selectedCompanies" [rowHover]="true" dataKey="id"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [showCurrentPageReport]="true">
         <ng-template pTemplate="caption">
             <div class="flex align-items-center justify-content-between">
-                <h5 class="m-0">Manage Companies</h5>
+                <h5 class="m-0 text-2xl font-bold">Manage Companies</h5>
                 <span class="p-input-icon-left">
                     <i class="pi pi-search"></i>
                     <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
@@ -36,9 +31,9 @@
                 <th pSortableColumn="name" style="min-width:15rem">Name <p-sortIcon field="name"></p-sortIcon></th>
                 <th>Image</th>
                 <th pSortableColumn="address">Address <p-sortIcon field="address"></p-sortIcon></th>
-                <th pSortableColumn="contactInfo.email" style="min-width:10rem">Email <p-sortIcon
-                        field="contactInfo.email"></p-sortIcon></th>
-                <th pSortableColumn="contactInfo.phone">Phone <p-sortIcon field="contactInfo.phone"></p-sortIcon></th>
+                <th pSortableColumn="contactInfo.email">Email <p-sortIcon field="contactInfo.email"></p-sortIcon></th>
+                <th pSortableColumn="contactInfo.phone" style="min-width:10rem">Phone <p-sortIcon
+                        field="contactInfo.phone"></p-sortIcon></th>
                 <th></th>
             </tr>
         </ng-template>
@@ -47,16 +42,23 @@
                 <td>
                     <p-tableCheckbox [value]="company"></p-tableCheckbox>
                 </td>
-                <td>{{company.name}}</td>
-                <td><img [src]="company.img" [alt]="company.name" width="50" class="shadow-4" /></td>
-                <td>{{company.address}}</td>
-                <td>{{company.contactInfo?.email}}</td>
-                <td>{{company.contactInfo?.phone}}</td>
+                <td class="text-xl">{{company.name}}</td>
+                <td>
+                    <p-image
+                        [src]="company.img ? company.img.url() : './../../assets/images/default-corporate-image.jpg'"
+                        [alt]="company.name" width="60" [preview]="true">
+                    </p-image>
+                </td>
+                <td class="text-xl">{{company.address}}</td>
+                <td class="text-xl">{{company.contactInfo?.email}}</td>
+                <td class="text-xl">{{company.contactInfo?.phone}}</td>
                 <td>
                     <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" severity="success"
                         (onClick)="editCompany(company)"></p-button>
                     <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
                         (onClick)="deleteCompany(company)"></p-button>
+                    <p-button icon="pi pi-users" class="mr-2" [rounded]="true" [outlined]="true" severity="info"
+                        (onClick)="manageUsers(company)"></p-button>
                 </td>
             </tr>
         </ng-template>
@@ -67,44 +69,114 @@
         </ng-template>
     </p-table>
 
-    <p-dialog [(visible)]="companyDialog" [style]="{ width: '450px' }" header="Product Details" [modal]="true"
-        styleClass="p-fluid">
+    <p-dialog [(visible)]="companyDialog" [style]="{ width: '450px' }" header="Product Details" [modal]="true">
         <ng-template pTemplate="content">
-            <div class="field">
+            <div class="field p-nogutter">
+                <label for="image">Image</label>
+                <div class="p-fileupload-wrapper" style="width: 100%;">
+                    <p-fileUpload [multiple]="false" name="image" accept="image/*" [maxFileSize]="1000000"
+                        (onSelect)="onImageUpload($event)" [auto]="false" chooseLabel="Select Image">
+                    </p-fileUpload>
+                </div>
+            </div>
+            <div class="field p-fluid">
                 <label for="name">Name</label>
                 <input type="text" pInputText id="name" [(ngModel)]="company.name" required autofocus />
                 <small class="p-error" *ngIf="submitted && !company.name">Name is required.</small>
             </div>
-            <div class="field">
+            <div class="field p-fluid">
                 <label for="address">Address</label>
                 <textarea id="address" pInputTextarea [(ngModel)]="company.address" required rows="3"
                     cols="20"></textarea>
             </div>
 
-            <div class="field">
+            <div class="field p-fluid">
                 <label for="email">Email</label>
                 <input type="text" pInputText id="email" [(ngModel)]="company.contactInfo.email" />
                 <small class="p-error" *ngIf="submitted && !company.contactInfo.email">Email is required.</small>
             </div>
 
-            <div class="field">
+            <div class="field p-fluid">
                 <label for="phone">Phone</label>
                 <input type="text" pInputText id="phone" [(ngModel)]="company.contactInfo.phone" />
             </div>
 
-            <div class="field">
-                <label for="image">Image</label>
-                <p-fileUpload name="image" accept="image/*" [maxFileSize]="1000000" (onUpload)="onImageUpload($event)">
-                    <ng-template pTemplate="content">
-                        <img *ngIf="company.img" [src]="company.img" [alt]="company.name" width="100" class="shadow-2 my-2" />
-                    </ng-template>
-                </p-fileUpload>
-            </div>
+
         </ng-template>
 
         <ng-template pTemplate="footer">
             <p-button label="Cancel" icon="pi pi-times" [text]="true" (onClick)="hideDialog()" />
             <p-button label="Save" icon="pi pi-check" [text]="true" (onClick)="saveCompany()" />
+        </ng-template>
+    </p-dialog>
+
+    <p-dialog [(visible)]="userDialog" [style]="{ width: '500px' }" header="Manage Users" [modal]="true">
+        <ng-template pTemplate="content">
+            <p-table [value]="users">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Image</th>
+                        <th>Username</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-user>
+                    <tr>
+                        <td>
+                            <p-avatar [image]="user.attributes.img?.url() ?? ''" icon="pi pi-user" 
+                                      width="50">
+                            </p-avatar>
+                        </td>
+                        <td>{{user.attributes.username}}</td>
+                        <td>{{user.attributes.contactInfo.phone}}</td>
+                        <td>{{user.attributes.contactInfo.email}}</td>
+                        <td>
+                            <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+                                severity="success" (onClick)="editUser(user)"></p-button>
+                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                                (onClick)="deleteUser(user)"></p-button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div class="mt-4">
+                <p-button label="Add User" icon="pi pi-plus" (onClick)="openAddUserDialog()"></p-button>
+            </div>
+        </ng-template>
+    </p-dialog>
+
+    <p-dialog [(visible)]="addUserDialog" [style]="{ width: '450px' }" header="Add User" [modal]="true">
+        <ng-template pTemplate="content">
+            <div class="field p-nogutter">
+                <label for="userImage">Image</label>
+                <div class="p-fileupload-wrapper" style="width: 100%;">
+                    <p-fileUpload [multiple]="false" name="userImage" accept="image/*" [maxFileSize]="1000000"
+                        (onSelect)="onUserImageUpload($event)" [auto]="false" chooseLabel="Select Image">
+                    </p-fileUpload>
+                </div>
+            </div>
+            <div class="field p-fluid">
+                <label for="username">Username</label>
+                <input type="text" pInputText id="username" [(ngModel)]="newUser.username" required autofocus />
+            </div>
+            <div class="field p-fluid">
+                <label for="password">Password</label>
+                <input type="password" pInputText id="password" [(ngModel)]="newUser.password" required />
+            </div>
+            <div class="field p-fluid">
+                <label for="phone">Phone</label>
+                <input type="text" pInputText id="phone" [(ngModel)]="newUser.contactInfo.phone" />
+            </div>
+            <div class="field p-fluid">
+                <label for="email">Email</label>
+                <input type="email" pInputText id="email" [(ngModel)]="newUser.contactInfo.email" />
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <p-button label="Cancel" icon="pi pi-times" [text]="true" (onClick)="hideAddUserDialog()"></p-button>
+            <p-button label="Save" icon="pi pi-check" [text]="true" (onClick)="saveUser()"></p-button>
         </ng-template>
     </p-dialog>
 
