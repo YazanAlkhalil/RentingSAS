@@ -233,9 +233,7 @@ export class TableComponent implements OnInit {
   }
 
   getUsers() {
-    const company = new Company()
-    company.id = this.selectedCompany.id
-    this.adminService.getUsersByCompany(company)
+    this.adminService.getUsersByCompany(this.selectedCompany.toPointer())
       .then(users => {
         this.users = users;
         console.log(this.users);
