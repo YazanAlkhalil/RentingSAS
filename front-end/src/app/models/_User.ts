@@ -3,6 +3,8 @@ import Parse from "parse";
 export class User extends Parse.User {
   constructor() {
     super({ className: 'User' });
+
+    this.set('contactInfo', { phone: '', email: '' });
   }
 
   get company_id(): Parse.Pointer {
@@ -43,6 +45,13 @@ export class User extends Parse.User {
 
   set contactInfo(value: ContactInfo) {
     this.set('contactInfo', value);
+  }
+  get img(): Parse.File {
+    return this.get('img');
+  }
+
+  set img(value: Parse.File) {
+    this.set('img', value);
   }
 }
 

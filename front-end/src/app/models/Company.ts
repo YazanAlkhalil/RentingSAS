@@ -32,11 +32,11 @@ export class Company extends Parse.Object {
     this.set('contactInfo', value);
   }
 
-  get img(): string {
+  get img(): Parse.File {
     return this.get('img');
   }
 
-  set img(value: string) {
+  set img(value: Parse.File) {
     this.set('img', value);
   }
 }

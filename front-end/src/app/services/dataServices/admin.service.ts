@@ -3,6 +3,8 @@ import {Building} from '../../models/Building'
 import { Query } from 'parse';
 import { Company } from '../../models/Company';
 import { ContactInfo } from '../../models/Interfaces/ContactInfo';
+import { User } from '../../models/_User'; 
+import Parse from 'parse';
 @Injectable({
   providedIn: 'root'
 })
@@ -16,7 +18,7 @@ export class AdminService {
         contactInfo:ContactInfo,
         skip:number,
         limit:number,
-        img:string,
+        img:Parse.File,
     }):Promise<Company>{
         const company = new Company()
         company.name = data.name
@@ -59,5 +61,35 @@ export class AdminService {
       query.withCount(true)
     }
     return query.find()
+  }
+
+  getUsersByCompany(companyId: string): Promise<User[]> {
+    
+    const query = new Query(User);
+    query.equalTo('company_id', companyId);
+    return query.find();
+  }
+
+  addUser(InputUser: User): Promise<Parse.User> {
+      const user = new Parse.User();
+
+      user.set("username", InputUser.username);
+      user.set("password",  InputUser.password);
+      user.set("contactInfo", InputUser.contactInfo);
+      user.set("company_id", InputUser.company_id);
+      user.set("img", InputUser.img); 
+
+      
+    return user.signUp();
+  }
+
+  updateUser(user: User): Promise<User> {
+    
+    return user.save();
+  }
+
+  deleteUser(user: User): Promise<User> {
+    
+    return user.destroy();
   }
 }
