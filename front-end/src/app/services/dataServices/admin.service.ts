@@ -78,9 +78,7 @@ export class AdminService {
       user.set("contactInfo", InputUser.contactInfo);
       user.set("company_id", InputUser.company_id);
       user.set("img", InputUser.img); 
-
-      
-    return user.signUp();
+    return user.save()
   }
 
   updateUser(user: User): Promise<User> {
