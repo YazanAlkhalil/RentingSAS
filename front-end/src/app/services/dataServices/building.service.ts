@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {Building} from '../../models/Building'
 import { Pointer, Query } from 'parse';
+import { Apartment } from '../../models/Interfaces/Apartment';
 @Injectable({
   providedIn: 'root'
 })
@@ -49,6 +50,7 @@ export class BuildingService {
     address:string,
     location:{ 'longitude':string , 'latitude':string } ,
     img:Parse.File,
+    apartments:Apartment[]
   }):Promise<Building>{
     const building = new Building()
     building.name = data.name

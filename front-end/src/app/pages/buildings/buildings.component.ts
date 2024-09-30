@@ -112,6 +112,7 @@ export class BuildingsComponent {
         this.buildings = this.buildings.filter(
           (val) => !this.selectedBuildings?.includes(val)
         );
+        this.selectedBuildings!.forEach( (x) =>this.buildingService.deleteBuilding(x))
         this.selectedBuildings = null;
         this.messageService.add({
           severity: "success",
@@ -181,6 +182,7 @@ export class BuildingsComponent {
               address: this.building.address,
               location: this.building.location,
               img: this.building.img,
+              apartments:[]
             })
             .then((building) => {
               this.buildings.push(building);

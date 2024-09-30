@@ -1,4 +1,4 @@
-<div class="card">
+<div class="card p-1">
   <p-toast />
   <p-toolbar styleClass="mb-4 gap-2">
     <ng-template pTemplate="left">
@@ -39,7 +39,7 @@
   >
     <ng-template pTemplate="caption">
       <div class="flex align-items-center justify-content-between">
-        <h5 class="m-0">Manage Buildings</h5>
+        <h5 class="m-0 text-3xl">Manage Buildings</h5>
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
           <input
@@ -71,13 +71,13 @@
         <td>
           <p-tableCheckbox [value]="building" />
         </td>
-        <td>
+        <td class="text-lg">
           {{ building.name }}
         </td>
-        <td>
+        <td class="text-lg">
           {{ building.address }}
         </td>
-        <td>
+        <td class="text-lg">
           {{ building.location.longitude }} , {{ building.location.latitude }}
         </td>
         <td>
@@ -88,7 +88,7 @@
                 : './../../assets/images/default-corporate-image.jpg'
             "
             [alt]="building.name"
-            width="60"
+            width="80"
             [preview]="true"
           >
           </p-image>
