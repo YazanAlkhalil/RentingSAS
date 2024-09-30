@@ -53,7 +53,7 @@ export class SidebarComponent implements OnInit {
     {
       id: "buildings",
       title: this.translateService.instant("buildings"),
-      icon: "pi pi-credit-card",
+      icon: "pi pi-building",
       routerLink: "/main/buildings",
     },
     {
@@ -61,6 +61,12 @@ export class SidebarComponent implements OnInit {
       icon: "pi pi-users",
       title: this.translateService.instant("users"),
       routerLink: "/main/users",
+    },
+    {
+      id: "apartments",
+      icon: "pi pi-home",
+      title: this.translateService.instant("apartments"),
+      routerLink: "/main/apartments",
     },
     {
       id:"reports",

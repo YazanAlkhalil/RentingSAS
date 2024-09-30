@@ -1,5 +1,9 @@
 import { CommonModule } from "@angular/common";
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+} from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { TranslateModule } from "@ngx-translate/core";
 import { ButtonModule } from "primeng/button";
@@ -14,6 +18,9 @@ import { TableModule } from "primeng/table";
 import { DialogModule } from "primeng/dialog";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { InputTextareaModule } from "primeng/inputtextarea";
+import { AuthService } from "../../services/other/auth.service";
+import { File } from "parse";
+import { ImageModule } from "primeng/image";
 
 @Component({
   selector: "app-buildings",
@@ -35,7 +42,8 @@ import { InputTextareaModule } from "primeng/inputtextarea";
     InputTextModule,
     ButtonModule,
     FormsModule,
-    FileUploadModule
+    FileUploadModule,
+    ImageModule,
   ],
   templateUrl: "./buildings.component.html",
   styleUrl: "./buildings.component.scss",
@@ -43,7 +51,7 @@ import { InputTextareaModule } from "primeng/inputtextarea";
 })
 export class BuildingsComponent {
   buildingDialog: boolean = false;
-  buildings!: Building[];
+  buildings: Building[] = [];
   building!: Building;
   submitted: boolean = false;
   statuses!: any[];
@@ -54,31 +62,39 @@ export class BuildingsComponent {
     searchValue: string;
     sortField: string;
     withCount: boolean;
+    company_id: Parse.Pointer;
   } = {
     skip: 0,
     limit: 5,
     searchValue: "",
     sortField: "name",
     withCount: true,
+    company_id: this.authService.getCurrentUser()?.get(""),
   };
   constructor(
     private buildingService: BuildingService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private authService: AuthService
   ) {}
 
+  getBuildings() {
+    this.buildingService
+      .getBuildings(this.data)
+      .then((data: Building[] | { results: Building[]; count: number }) => {
+        if (Array.isArray(data)) {
+          this.buildings = data;
+        } else {
+          this.buildings = data.results;
+        }
+        this.cd.detectChanges();
+      });
+  }
+
   ngOnInit() {
-    this.cd.detectChanges()
-    this.buildingService.getBuildings(this.data).then((data) => {
-      if ("results" in data) {
-        this.buildings = data.results;
-      } else {
-        this.buildings = data;
-      }
-      console.log("data", this.buildings);
-      this.cd.detectChanges()
-    });
+    this.getBuildings();
+    this.authService.getCurrentUser();
   }
 
   openNew() {
@@ -88,7 +104,6 @@ export class BuildingsComponent {
   }
 
   deleteSelectedBuildings() {
-    
     this.confirmationService.confirm({
       message: "Are you sure you want to delete the selected buildings?",
       header: "Confirm",
@@ -97,6 +112,7 @@ export class BuildingsComponent {
         this.buildings = this.buildings.filter(
           (val) => !this.selectedBuildings?.includes(val)
         );
+        this.selectedBuildings!.forEach( (x) =>this.buildingService.deleteBuilding(x))
         this.selectedBuildings = null;
         this.messageService.add({
           severity: "success",
@@ -115,24 +131,29 @@ export class BuildingsComponent {
 
   deleteBuilding(building: Building) {
     this.confirmationService.confirm({
-      message: 'Are you sure you want to delete ' + building.name + '?',
-      header: 'Confirm',
-      icon: 'pi pi-exclamation-triangle',
+      message: "Are you sure you want to delete " + building.name + "?",
+      header: "Confirm",
+      icon: "pi pi-exclamation-triangle",
       accept: async () => {
         try {
-          await this.buildingService.deleteBuilding(building)
-          this.buildingService.getBuildings(this.data)
-          this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Company Deleted', life: 3000 });
-        } catch (error) {
-          console.error('Error deleting building:', error);
+          await this.buildingService.deleteBuilding(building);
+          this.getBuildings();
           this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to delete building',
-            life: 3000
-          })
+            severity: "success",
+            summary: "Successful",
+            detail: "Building Deleted",
+            life: 3000,
+          });
+        } catch (error) {
+          console.log("Error deleting building:", error);
+          this.messageService.add({
+            severity: "error",
+            summary: "Error",
+            detail: "Failed to delete building",
+            life: 3000,
+          });
         }
-      }
+      },
     });
   }
 
@@ -140,27 +161,47 @@ export class BuildingsComponent {
     this.buildingDialog = false;
     this.submitted = false;
   }
-
-  saveBuilding() {
+  async saveBuilding() {
     this.submitted = true;
     if (this.building.name?.trim()) {
       if (this.building.id) {
         this.buildings[this.findIndexById(this.building.id)] = this.building;
+        await this.building.save();
         this.messageService.add({
           severity: "success",
           summary: "Successful",
-          detail: "Product Updated",
+          detail: "Building Updated",
           life: 3000,
         });
       } else {
-        this.building.img = "product-placeholder.svg";
-        this.buildings.push(this.building);
-        this.messageService.add({
-          severity: "success",
-          summary: "Successful",
-          detail: "Product Created",
-          life: 3000,
-        });
+        try {
+          this.buildingService
+            .addBuilding({
+              company_id: this.data.company_id,
+              name: this.building.name,
+              address: this.building.address,
+              location: this.building.location,
+              img: this.building.img,
+              apartments:[]
+            })
+            .then((building) => {
+              this.buildings.push(building);
+              this.messageService.add({
+                severity: "success",
+                summary: "Successful",
+                detail: "Building Created",
+                life: 3000,
+              });
+            });
+        } catch (error: Error | any) {
+          console.log(error);
+          this.messageService.add({
+            severity: "error",
+            summary: "Error",
+            detail: error.message,
+            life: 3000,
+          });
+        }
       }
 
       this.buildings = [...this.buildings];
@@ -179,5 +220,10 @@ export class BuildingsComponent {
     }
 
     return index;
+  }
+  onImageUpload(event: any) {
+    const file = event.files[0];
+    const parseFile = new File(file.name, file);
+    this.building.img = parseFile;
   }
 }
