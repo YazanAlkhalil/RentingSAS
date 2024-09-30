@@ -249,6 +249,8 @@ export class TableComponent implements OnInit {
 
   openAddUserDialog() {
     this.newUser = new User();
+    console.log(this.newUser);
+    
     this.addUserDialog = true;
   }
 
@@ -269,15 +271,15 @@ export class TableComponent implements OnInit {
       })
       .catch(error => {
         console.error('Error adding user:', error);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to add user', life: 3000 });
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: error.message, life: 3000 });
       });
   }
 
   editUser(user: User) {
-    this.adminService.updateUser(user)
-      .then(() => {
-        this.getUsers();
-      });
+    this.newUser = user;
+    console.log(this.newUser);
+    
+    this.addUserDialog = true;
   }
 
   deleteUser(user: User) {
