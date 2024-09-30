@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
-import { Session, User,Query,Role } from "parse";
+import { Session, User,Query,Role , } from "parse";
 
 @Injectable({
   providedIn: "root",
@@ -10,6 +10,16 @@ export class AuthService {
 
   async logIn(username: string, password: string): Promise<User> {
     return await User.logIn(username, password);
+  }
+
+  async signUp(){
+    const user = new User()
+    user.set('username' , 'me')
+    user.set('password' , '12345'),
+    user.set('company_id' , 'TIqTqXgve1')
+    console.log(user, 'user');
+    return await user.save()
+    
   }
 
   async logOut(): Promise<User> {

@@ -1,5 +1,5 @@
 import { ContactInfo } from "./Interfaces/ContactInfo";
-
+import Parse from "parse";
 export class User extends Parse.User {
   constructor() {
     super({ className: 'User' });
