@@ -1,19 +1,20 @@
 import { Injectable } from '@angular/core';
 import {Building} from '../../models/Building'
-import { Query } from 'parse';
+import { Pointer, Query } from 'parse';
 @Injectable({
   providedIn: 'root'
 })
 export class BuildingService {
 
-  constructor() { }
+  constructor( ) { }
   getBuildings(data: {
     skip: number,
     limit: number,
     sortField: string,
     searchValue: string,
-    withCount: boolean
-  }): Promise<{ results: Building[]; count: number } | Building[]> {
+    withCount: boolean,
+    company_id:Pointer
+  }): Promise<Building[]> {
   
     let query = new Query(Building);
   
@@ -37,24 +38,25 @@ export class BuildingService {
       ]);
   
     if (data.withCount) {
-      return query.find().then((results) => {
-        return query.count().then((count) => {
-          return { results, count };
-        });
-      });
-    } else {
-      return query.find();
-    }
+      query.withCount(true)
   }
+  return query.find()
+}
 
-  async addBuilding(){
-    const newBuilding = new Building()
-    newBuilding.set('company_id' , 'TIqTqXgve1')
-    newBuilding.set('name' , 'Yazzona')
-    // newBuilding.set('location' , '150 , 270')
-    newBuilding.set('img','img')
-    console.log(newBuilding , 'building');
-    return await newBuilding.save()
+  async addBuilding(data:{
+    name:string,
+    company_id:Pointer,
+    address:string,
+    location:{ 'longitude':string , 'latitude':string } ,
+    img:Parse.File,
+  }):Promise<Building>{
+    const building = new Building()
+    building.name = data.name
+    building.company_id = data.company_id
+    building.address = data.address
+    building.location = data.location
+    building.img = data.img
+    return building.save()
   }
 
    deleteBuilding( building: Building ){
