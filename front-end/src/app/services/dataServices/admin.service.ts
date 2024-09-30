@@ -30,7 +30,7 @@ export class AdminService {
 
 
     deleteCompany(company:Company):Promise<Company>{
-        return company.destroy()
+        return Parse.Cloud.run('deleteCompany',{id:company.id})
     }
 
   getCompanies(data:{
@@ -63,8 +63,7 @@ export class AdminService {
     return query.find()
   }
 
-  getUsersByCompany(companyId: string): Promise<User[]> {
-    
+  getUsersByCompany(companyId: Parse.Pointer): Promise<User[]> {
     const query = new Query(User);
     query.equalTo('company_id', companyId);
     return query.find();
