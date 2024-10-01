@@ -55,10 +55,10 @@
                 <td>
                     <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" severity="success"
                         (onClick)="editCompany(company)"></p-button>
-                    <p-button icon="pi pi-trash" class="mr-2" severity="danger" [rounded]="true" [outlined]="true"
-                        (onClick)="deleteCompany(company)"></p-button>
-                    <p-button icon="pi pi-users" class="mr-2" [rounded]="true" [outlined]="true" severity="info"
+                        <p-button icon="pi pi-users" class="mr-2" [rounded]="true" [outlined]="true" severity="info"
                         (onClick)="manageUsers(company)"></p-button>
+                        <p-button icon="pi pi-trash" class="mr-2" severity="danger" [rounded]="true" [outlined]="true"
+                            (onClick)="deleteCompany(company)"></p-button>
                 </td>
             </tr>
         </ng-template>
@@ -110,8 +110,11 @@
         </ng-template>
     </p-dialog>
 
-    <p-dialog [(visible)]="userDialog" [style]="{ width: '500px' }" header="Manage Users" [modal]="true">
+    <p-dialog [(visible)]="userDialog" [style]="{ width: '600px' }" header="Manage Users" [modal]="true">
         <ng-template pTemplate="content">
+            <div class="mb-4">
+                <p-button label="Add User" icon="pi pi-plus" (onClick)="openAddUserDialog()"></p-button>
+            </div>
             <p-table [value]="users">
                 <ng-template pTemplate="header">
                     <tr>
@@ -142,9 +145,7 @@
                     </tr>
                 </ng-template>
             </p-table>
-            <div class="mt-4">
-                <p-button label="Add User" icon="pi pi-plus" (onClick)="openAddUserDialog()"></p-button>
-            </div>
+            
         </ng-template>
     </p-dialog>
 

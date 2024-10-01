@@ -59,13 +59,12 @@ export class TableComponent implements OnInit {
 
   getCompanies() {
     this.adminService.getCompanies({
-      skip: 0,
-      limit: 10,
-      sortField: 'name',
       searchValue: '',
       withCount: false
     }).then((data: Company[]) => {
       this.companies = data;
+      console.log(data);
+            
       this.cd.detectChanges()
     });
   }
@@ -156,7 +155,8 @@ export class TableComponent implements OnInit {
     });
   }
 
-  hideDialog() {
+  hideDialog() {  
+    this.company.fetch()  
     this.companyDialog = false;
     this.submitted = false;
   }
@@ -233,6 +233,7 @@ export class TableComponent implements OnInit {
   }
 
   getUsers() {
+    this.cd.detectChanges();
     this.adminService.getUsersByCompany(this.selectedCompany.toPointer())
       .then(users => {
         this.users = users;
@@ -252,10 +253,25 @@ export class TableComponent implements OnInit {
   }
 
   hideAddUserDialog() {
-    this.addUserDialog = false;
+    this.newUser.fetch()
+    this.addUserDialog = false;    
+    this.cd.detectChanges()
   }
 
-  saveUser() {
+  async saveUser() {
+    if(this.newUser.id){
+      try {
+        await this.newUser.save()
+        this.getUsers()
+        this.cd.detectChanges()
+        this.addUserDialog = false;
+        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'User Updated', life: 3000 });
+      } catch (error: ParseError | any) {
+        console.error('Error updating user:', error);
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: error.message, life: 3000 });
+      }
+      return
+    }
     const company = new Company()
     company.id = this.selectedCompany.id
     this.newUser.set('company_id', company);
@@ -263,7 +279,7 @@ export class TableComponent implements OnInit {
     
     this.adminService.addUser(this.newUser)
       .then(user => {
-        this.users.push(user);        
+        this.getUsers()       
         this.cd.detectChanges();
         this.addUserDialog = false;
         this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'User Added', life: 3000 });
@@ -275,7 +291,12 @@ export class TableComponent implements OnInit {
   }
 
   editUser(user: User) {
-    this.newUser = user;
+    this.newUser.set('username', user.attributes["username"])
+    this.newUser.set('password', user.attributes["password"])
+    this.newUser.set('contactInfo', user.attributes["contactInfo"])
+    this.newUser.set('img', user.attributes["img"])
+    this.newUser.id = user.id
+    // this.newUser = user;
     console.log(this.newUser);
     
     this.addUserDialog = true;

@@ -7,9 +7,10 @@ import { User } from '../../models/_User';
 import Parse from 'parse';
 import { FormsModule } from '@angular/forms';
 import { AvatarModule } from 'primeng/avatar';
+import { Report } from '../../models/Report';
 @Component({
-    selector: 'app-users',
-    templateUrl: './users.component.html',
+    selector: 'app-reports',
+    templateUrl: './reports.component.html',
     standalone: true,
     imports: [CommonModule,TableModule,ButtonModule,FormsModule ,AvatarModule,InputTextModule],
     providers: [],
@@ -119,9 +120,8 @@ import { AvatarModule } from 'primeng/avatar';
     `
     ],
 })
-export class UsersComponent implements OnInit {
-    users!: User[];
-    roles!: any[];
+export class ReportsComponent implements OnInit {
+    reports!: Report[];
     loading: boolean = true;
 
     constructor(private cd: ChangeDetectorRef) {}
@@ -129,12 +129,14 @@ export class UsersComponent implements OnInit {
     ngOnInit() {
         const company_id = Parse.User.current()?.attributes["company_id"];
         if(!company_id) return;
-        const query = new Parse.Query(User);
+        const query = new Parse.Query(Report);
         query.equalTo('company_id', company_id);
-        
-        query.find().then((users) => {
+        query.include('apartment_id');
+        query.include('building_id');
+        query.include('user_id');
+        query.find().then((reports) => {
           
-          this.users = users;
+          this.reports = reports;
           this.loading = false;
           this.cd.detectChanges();
         }).catch((error) => {
