@@ -198,7 +198,14 @@ export class BuildingsComponent {
                 detail: "Building Created",
                 life: 3000,
               });
-            });
+            }).catch((error:Error | any)=>{
+              this.messageService.add({
+                severity: "error",
+                summary: "Error",
+                detail: error.message,
+                life: 3000,
+              });
+            })
         } catch (error: Error | any) {
           console.log(error);
           this.messageService.add({

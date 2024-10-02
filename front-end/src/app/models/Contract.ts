@@ -5,6 +5,7 @@ import { Payment } from "./Interfaces/Payment";
 export class Contract extends Parse.Object {
   constructor() {
     super('Contract');
+    
   }
 
   get startDate(): Date {

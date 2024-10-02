@@ -38,20 +38,20 @@
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-company>
-            <tr>
+            <tr class="text-2xl">
                 <td>
                     <p-tableCheckbox [value]="company"></p-tableCheckbox>
                 </td>
-                <td class="text-xl">{{company.name}}</td>
+                <td>{{company.name}}</td>
                 <td>
                     <p-image
                         [src]="company.img ? company.img.url() : './../../assets/images/default-corporate-image.jpg'"
-                        [alt]="company.name" width="60" [preview]="true">
+                        [alt]="company.name" width="80" [preview]="true">
                     </p-image>
                 </td>
-                <td class="text-xl">{{company.address}}</td>
-                <td class="text-xl">{{company.contactInfo?.email}}</td>
-                <td class="text-xl">{{company.contactInfo?.phone}}</td>
+                <td>{{company.address}}</td>
+                <td>{{company.contactInfo?.email}}</td>
+                <td>{{company.contactInfo?.phone}}</td>
                 <td>
                     <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" severity="success"
                         (onClick)="editCompany(company)"></p-button>

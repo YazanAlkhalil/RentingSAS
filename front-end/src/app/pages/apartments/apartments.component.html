@@ -25,12 +25,20 @@
   [rows]="10"
   [paginator]="true"
   [globalFilterFields]="[
-    'status'
+    'buildingName',
+    'buildingId',
+    'apartment.floor',
+    'apartment.size',
+    'apartment.isFurnished',
+    'apartment.status',
+    'apartment.bedroom',
+    'apartment.bathroom',
+    'apartment.rentPrice',
   ]"
   [tableStyle]="{ 'min-width': '75rem' }"
   [(selection)]="selectedApartments"
   [rowHover]="true"
-  dataKey="id"
+  dataKey="apartment._id"
   currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
   [showCurrentPageReport]="true"
 >
@@ -53,29 +61,29 @@
       <th>
         <p-tableHeaderCheckbox />
       </th>
-      <th >Building Name </th>
-      <th > Floor </th>
-      <th>Size</th>
-      <th>Status</th>
-      <th>Furnished</th>
-      <th>Bedroom</th>
-      <th>Bathroom</th>
-      <th>Rent Price</th>
+      <th pSortableColumn="buildingName">Building Name <p-sortIcon field="buildingName"/></th>
+      <th pSortableColumn="apartment.floor"> Floor <p-sortIcon field="apartment.floor"/></th>
+      <th pSortableColumn="apartment.size">Size<p-sortIcon field="apartment.size"/></th>
+      <th pSortableColumn="apartment.status">Status<p-sortIcon field="apartment.status"/></th>
+      <th pSortableColumn="apartment.isFurnished">Furnished<p-sortIcon field="apartment.isFurnished"/></th>
+      <th pSortableColumn="apartment.bedroom">Bedroom<p-sortIcon field="apartment.bedroom"/></th>
+      <th pSortableColumn="apartment.bathroom">Bathroom<p-sortIcon field="apartment.bathroom"/></th>
+      <th pSortableColumn="apartment.rentPrice">Rent Price<p-sortIcon field="apartment.rentPrice"/></th>
       <th>Processes</th>
     </tr> </ng-template
   >0.0
   <ng-template pTemplate="body" let-apartment>
-    <tr>
+    <tr class="text-2xl">
       <td>
         <p-tableCheckbox [value]="apartment" />
       </td>
-      <td class="text-lg">
+      <td>
         {{ apartment.buildingName }} 
       </td>
-      <td class="text-lg">
+      <td>
         {{ apartment.apartment.floor }}
       </td>
-      <td class="text-lg">
+      <td>
         {{apartment.apartment.size}}
       </td>
       <!-- <td>
@@ -100,12 +108,20 @@
       <td> {{apartment.apartment.rentPrice ? apartment.apartment.rentPrice +'$' : 'no price' }}  </td>
       <td>
         <p-button
+          icon="pi pi-bars"
+          class="mr-2"
+          [rounded]="true"
+          [outlined]="true"
+          severity="help"
+          (onClick)="moreDetails(apartment)"
+        />
+        <p-button
           icon="pi pi-pencil"
           class="mr-2"
           [rounded]="true"
           [outlined]="true"
           severity="success"
-          (onClick)="editApartment(apartment.apartment)"
+          (onClick)="editApartment(apartment)"
         />
         <p-button
           icon="pi pi-trash"
@@ -125,15 +141,59 @@
   </ng-template>
 </p-table>
 <p-dialog
+    [(visible)]="moreDetailsDialog"
+    [style]="{ width: '800px' }"
+    header="Apartment Details"
+    [modal]="true"
+  >
+  <div *ngIf="apartment">
+    <div class="grid">
+      <div class="col-12">
+        <p-carousel *ngIf="apartment.img && apartment.img.length > 0" [value]="apartment.img" [numVisible]="1" [numScroll]="1">
+          <ng-template let-img pTemplate="item">
+            <img [src]="img.url()" [alt]="apartment.number" style="width: 100%;" />
+          </ng-template>
+        </p-carousel>
+      </div>
+      <div class="col-12">
+        <h2>Apartment {{ apartment.number }}</h2>
+        <div class="grid text-2xl">
+          <div class="col-6">
+            <p><strong>Floor:</strong> {{ apartment.floor }}</p>
+            <p><strong>Size:</strong> {{ apartment.size }}</p>
+            <p><strong>Bedrooms:</strong> {{ apartment.bedroom }}</p>
+            <p><strong>Bathrooms:</strong> {{ apartment.bathroom }}</p>
+          </div>
+          <div class="col-6">
+            <p><strong>Furnished:</strong> {{ apartment.isFurnished ? 'Yes' : 'No' }}</p>
+            <p><strong>Status:</strong> {{ apartment.status }}</p>
+            <p><strong>Rent Price:</strong> {{ apartment.rentPrice | currency:'USD' }}</p>
+            <p><strong>Description:</strong> {{ apartment.description }}</p>
+          </div>
+          <div class="col-6">
+            <p><strong>Amenities:</strong></p>
+            <ul>
+              <li *ngFor="let amenity of apartment.amenities">{{ $any(amenity).name }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+<p-dialog
     [(visible)]="apartmentDialog"
     [style]="{ width: '450px' }"
     header="Apartment Details"
     [modal]="true"
-    styleClass="p-fluid"
   >
     <ng-template pTemplate="content">
+      <div *ngIf="apartment.img && apartment.img.length > 0" class="mb-3">
+        <p>Current Images:</p>
+        <p-button label="View Images" (click)="openImagesDialog()"></p-button>
+      </div>
       <div class="field p-nogutter">
-        <label for="image">Image</label>
+        <label for="image">Images</label>
         <div class="p-fileupload-wrapper" style="width: 100%">
           <p-fileUpload
             [multiple]="true"
@@ -146,8 +206,9 @@
           >
           </p-fileUpload>
         </div>
+        
       </div>
-      <div class="field">
+      <div class="field  p-fluid">
         <p-dropdown
         [(ngModel)]="selectedBuilding"
         [options]="dropdownBuildings"
@@ -158,7 +219,7 @@
         </p-dropdown>
         <small class="p-error" *ngIf="submitted && !apartment.number">Building is required.</small>
       </div>
-      <div class="field">
+      <div class="field  p-fluid">
         <label for="number">Number</label>
         <p-inputNumber 
         id="number" 
@@ -168,7 +229,7 @@
           Number is required.
         </small>
       </div>
-      <div class="field">
+      <div class="field  p-fluid">
         <label for=" floor ">Floor</label>
         <p-inputNumber 
         id="floor" 
@@ -176,7 +237,7 @@
         />
         <small class="p-error" *ngIf="submitted && !apartment.floor">Floor is required.</small>
       </div>
-      <div class="field">
+      <div class="field  p-fluid">
         <label for="size">Size</label>
         <p-inputNumber 
         id="size" 
@@ -184,7 +245,7 @@
         />
         <small class="p-error" *ngIf="submitted && !apartment.size">Size is required.</small>
         </div>
-      <div class="field">
+      <div class="field  p-fluid">
         <label for="bedroom"> Bedroom </label>
         <p-inputNumber 
         id="bedroom" 
@@ -192,7 +253,7 @@
         />
         <small class="p-error" *ngIf="submitted && !apartment.bedroom">Bedroom is required.</small>
       </div>
-      <div class="field">
+      <div class="field  p-fluid">
         <label for="bathromm"> Bathroom </label>
         <p-inputNumber 
         id="bathroom" 
@@ -200,7 +261,7 @@
         />
         <small class="p-error" *ngIf="submitted && !apartment.bathroom">Bathroom is required.</small>
       </div>
-      <div class="field">
+      <div class="field  p-fluid">
         <label for="description"> Description </label>
         <textarea
         pInputTextarea
@@ -211,14 +272,25 @@
         id="description">
         </textarea>
       </div>
-      <div class="field">
+      <div class="field  p-fluid">
         <label for="price"> Rent Price </label>
         <p-inputNumber 
         id="price" 
         [(ngModel)]="apartment.rentPrice"
         />
       </div>
-      <div class="field">
+      <div class="field p-fluid">
+        <label for="amenities">Amenities</label>
+        <p-multiSelect 
+          [options]="amenitiesOptions" 
+          [(ngModel)]="selectedAmenities"
+          optionLabel="name"
+          [style]="{'width':'100%'}"
+          [filter]="false"
+          placeholder="Select amenities"
+        ></p-multiSelect>
+      </div>
+      <div class="field  p-fluid">
         <p-checkbox
         label="Furnished"
         name="furnished"
@@ -226,6 +298,7 @@
         value="true"
         />        
       </div>
+      
     </ng-template>
     <ng-template pTemplate="footer">
       <p-button
@@ -242,8 +315,20 @@
       />
     </ng-template>
   </p-dialog>
+
+  <p-dialog header="Apartment Images" [(visible)]="imagesDialog" [modal]="true" [style]="{width: '600'}">
+    <div class="grid" *ngIf="apartment && apartment.img">
+      <div *ngFor="let img of apartment.img; let i = index" class="col-4 mb-3">
+        <div *ngIf="img.url()" class="relative">
+          <img [src]="img.url()" alt="Apartment Image" style="width: 100%; height: auto;">
+          <button pButton pRipple type="button" icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text absolute top-0 right-0" (click)="deleteImage(i)"></button>
+        </div>
+      </div>
+    </div>
+  </p-dialog>
   <p-confirmDialog [style]="{ width: '450px' }" />
 </div>
+
 
   
 
