@@ -34,9 +34,9 @@ export class AdminService {
     }
 
   getCompanies(data:{
-    skip:number,
-    limit:number,
-    sortField:string,
+    // skip:number,
+    // limit:number,
+    // sortField:string,
     searchValue:string,
     withCount:boolean
   }): Promise<{ results: Company[]; count: number } | Company[] | any > {
@@ -47,9 +47,9 @@ export class AdminService {
       query = Query.or(descQuery)
     }
     query
-    .descending(data.sortField)
-    .skip(data.skip)
-    .limit(data.limit)
+    // .descending(data.sortField)
+    // .skip(data.skip)
+    // .limit(data.limit)
     .descending('createdAt')
     .include([
       'name',

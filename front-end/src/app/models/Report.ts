@@ -1,3 +1,5 @@
+import Parse from 'parse';
+
 export class Report extends Parse.Object {
   constructor() {
     super('Report');

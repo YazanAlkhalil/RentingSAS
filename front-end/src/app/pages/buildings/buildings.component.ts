@@ -16,11 +16,11 @@ import { ConfirmationService, MessageService } from "primeng/api";
 import { BuildingService } from "../../services/dataServices/building.service";
 import { TableModule } from "primeng/table";
 import { DialogModule } from "primeng/dialog";
-import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { InputTextareaModule } from "primeng/inputtextarea";
 import { AuthService } from "../../services/other/auth.service";
 import { File } from "parse";
 import { ImageModule } from "primeng/image";
+import { ConfirmDialogModule } from "primeng/confirmdialog";
 
 @Component({
   selector: "app-buildings",
@@ -31,13 +31,13 @@ import { ImageModule } from "primeng/image";
     ToolbarModule,
     InputTextModule,
     FormsModule,
+    ConfirmDialogModule,
     ReactiveFormsModule,
     CommonModule,
     FileUploadModule,
     ToastModule,
     TableModule,
     DialogModule,
-    ConfirmDialogModule,
     InputTextareaModule,
     InputTextModule,
     ButtonModule,
@@ -45,6 +45,7 @@ import { ImageModule } from "primeng/image";
     FileUploadModule,
     ImageModule,
   ],
+  providers: [MessageService, ConfirmationService],
   templateUrl: "./buildings.component.html",
   styleUrl: "./buildings.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -135,7 +136,7 @@ export class BuildingsComponent {
   deleteBuilding(building: Building) {
     this.confirmationService.confirm({
       message: "Are you sure you want to delete " + building.name + "?",
-      header: "Confirm",
+      header: "Confirm 2",
       icon: "pi pi-exclamation-triangle",
       accept: async () => {
         try {
@@ -161,6 +162,7 @@ export class BuildingsComponent {
   }
 
   hideDialog() {
+    this.building.revert()
     this.buildingDialog = false;
     this.submitted = false;
     this.getBuildings()

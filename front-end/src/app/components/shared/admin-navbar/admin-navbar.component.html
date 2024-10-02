@@ -51,11 +51,7 @@
       *ngIf="currentTheme === 'dark'"
     >
     </p-button>
-    <app-blur-image
-      [image]="authService.getCurrentUser()?.get('profilePic')"
-      [height]="40"
-      class="mb-2 border-r-8"
-    ></app-blur-image>
+    
     <div pRipple class="m-0 mb-1 p-3 menuItem" (click)="logout()">
       <i class="pi pi-sign-out mx-2 hover:cursor-pointer" style="font-size: 1.5rem"></i>
       <!-- <span class="font-semibold capitalize">{{"logout" | translate}}</span> -->

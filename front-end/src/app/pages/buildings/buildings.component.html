@@ -26,9 +26,9 @@
     [paginator]="true"
     [globalFilterFields]="[
       'name',
-      'country.name',
-      'representative.name',
-      'status'
+      'location.longitude',
+      'location.latitude',
+      'address',
     ]"
     [tableStyle]="{ 'min-width': '75rem' }"
     [(selection)]="selectedBuildings"
@@ -58,8 +58,8 @@
           <p-tableHeaderCheckbox />
         </th>
         <th pSortableColumn="name">Name <p-sortIcon field="name" /></th>
-        <th pSortableColumn="address">
-          Address <p-sortIcon field="address" />
+        <th>
+          Address
         </th>
         <th>Location</th>
         <th>Image</th>
@@ -219,5 +219,5 @@
       />
     </ng-template>
   </p-dialog>
-  <p-confirmDialog [style]="{ width: '450px' }" />
+  <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
 </div>

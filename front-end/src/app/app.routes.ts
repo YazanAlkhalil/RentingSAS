@@ -37,13 +37,18 @@ export const routes: Routes = [
       },
       {
         path: "main",
-        // canActivate: [authGuard],
-        // canActivateChild: [authGuard],
+        canActivate: [authGuard],
+        canActivateChild: [authGuard],
         loadComponent: () =>
           import("./components/layouts/main-layout/main-layout.component").then(
             (m) => m.MainLayoutComponent
           ),
           children:[
+            {
+              path:"",
+              redirectTo: "buildings",
+              pathMatch: "full"
+            },
             {
               path:"buildings",
               loadComponent: () => 
@@ -62,6 +67,12 @@ export const routes: Routes = [
               loadComponent: () => 
                 import('./pages/apartments/apartments.component')
               .then( (m) => m.ApartmentsComponent )
+            },
+            {
+              path:'reports',
+              loadComponent: () => 
+                import('./pages/reports/reports.component')
+              .then( (m) => m.ReportsComponent )
             },
 
           ]
