@@ -4,7 +4,7 @@ import {
   ChangeDetectorRef,
   Component,
 } from "@angular/core";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { TranslateModule } from "@ngx-translate/core";
 import { ButtonModule } from "primeng/button";
 import { InputTextModule } from "primeng/inputtext";
@@ -52,7 +52,8 @@ import { ImageModule } from "primeng/image";
 export class BuildingsComponent {
   buildingDialog: boolean = false;
   buildings: Building[] = [];
-  building!: Building;
+  buildingsName: any[] = []
+  building: Building = new Building();
   submitted: boolean = false;
   statuses!: any[];
   selectedBuildings!: Building[] | null;
@@ -68,7 +69,7 @@ export class BuildingsComponent {
     limit: 5,
     searchValue: "",
     sortField: "name",
-    withCount: true,
+    withCount: false,
     company_id: this.authService.getCurrentUser()?.get("company_id"),
   };
   constructor(
@@ -79,22 +80,24 @@ export class BuildingsComponent {
     private authService: AuthService
   ) {}
 
-  getBuildings() {
+  getBuildings() : Building[]{
     this.buildingService
       .getBuildings(this.data)
-      .then((data: Building[] | { results: Building[]; count: number }) => {
-        if (Array.isArray(data)) {
+      .then((data: Building[]) => {
           this.buildings = data;
-        } else {
-          this.buildings = data.results;
-        }
+           this.buildingsName = data.map( x =>x.get('name'))   
         this.cd.detectChanges();
+        console.log(this.buildings,'bds');
+        console.log(this.buildingsName,'names');
       });
+      return this.buildings
   }
-
   ngOnInit() {
     this.getBuildings();
     this.authService.getCurrentUser();
+    console.log(this.authService.getCurrentUser()?.get('username'),'user');
+    console.log(this.authService.getCurrentUser() ,'user');
+    console.log(this.authService.getCurrentUser()?.get('contactInfo').phone,'user');
   }
 
   openNew() {
@@ -160,12 +163,13 @@ export class BuildingsComponent {
   hideDialog() {
     this.buildingDialog = false;
     this.submitted = false;
+    this.getBuildings()
+    this.cd.detectChanges()
   }
   async saveBuilding() {
     this.submitted = true;
     if (this.building.name?.trim()) {
       if (this.building.id) {
-        this.buildings[this.findIndexById(this.building.id)] = this.building;
         await this.building.save();
         this.messageService.add({
           severity: "success",
@@ -203,24 +207,12 @@ export class BuildingsComponent {
           });
         }
       }
-
       this.buildings = [...this.buildings];
       this.buildingDialog = false;
       this.building = new Building();
     }
   }
 
-  findIndexById(id: string): number {
-    let index = -1;
-    for (let i = 0; i < this.buildings.length; i++) {
-      if (this.buildings[i].id === id) {
-        index = i;
-        break;
-      }
-    }
-
-    return index;
-  }
   onImageUpload(event: any) {
     const file = event.files[0];
     const parseFile = new File(file.name, file);

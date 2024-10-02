@@ -1,1 +1,249 @@
-<p>apartments works!</p>
+<div class="card p-1">
+  <p-toast />
+  <p-toolbar styleClass="mb-4 gap-2">
+    <ng-template pTemplate="left">
+      <p-button
+        severity="success"
+        label="New"
+        icon="pi pi-plus"
+        class="mr-2"
+        (onClick)="openNew()"
+      />
+      <p-button
+        severity="danger"
+        label="Delete"
+        icon="pi pi-trash"
+        (onClick)="deleteSelectedApartments()"
+        [disabled]="!selectedApartments || !selectedApartments.length"
+      />
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+  #dt
+  [value]="apartments"
+  [rows]="10"
+  [paginator]="true"
+  [globalFilterFields]="[
+    'status'
+  ]"
+  [tableStyle]="{ 'min-width': '75rem' }"
+  [(selection)]="selectedApartments"
+  [rowHover]="true"
+  dataKey="id"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+  [showCurrentPageReport]="true"
+>
+  <ng-template pTemplate="caption">
+    <div class="flex align-items-center justify-content-between">
+      <h5 class="m-0 text-3xl">Manage Apartments</h5>
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          type="text"
+          (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+          placeholder="Search..."
+        />
+      </span>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="header">
+    <tr>
+      <th>
+        <p-tableHeaderCheckbox />
+      </th>
+      <th >Building Name </th>
+      <th > Floor </th>
+      <th>Size</th>
+      <th>Status</th>
+      <th>Furnished</th>
+      <th>Bedroom</th>
+      <th>Bathroom</th>
+      <th>Rent Price</th>
+      <th>Processes</th>
+    </tr> </ng-template
+  >0.0
+  <ng-template pTemplate="body" let-apartment>
+    <tr>
+      <td>
+        <p-tableCheckbox [value]="apartment" />
+      </td>
+      <td class="text-lg">
+        {{ apartment.buildingName }} 
+      </td>
+      <td class="text-lg">
+        {{ apartment.apartment.floor }}
+      </td>
+      <td class="text-lg">
+        {{apartment.apartment.size}}
+      </td>
+      <!-- <td>
+        <p-image
+          [src]="
+            apartment.img
+              ? apartment.img.url()
+              : './../../assets/images/default-corporate-image.jpg'
+          "
+          [alt]="apartment.name"
+          width="80"
+          [preview]="true"
+        >
+        </p-image>
+      </td> -->
+      <td> {{apartment.apartment.status}} </td>
+      <td>
+        {{apartment.apartment.isFurnished}}
+      </td>
+      <td> {{apartment.apartment.bedroom}} </td>
+      <td> {{apartment.apartment.bathroom}}  </td>
+      <td> {{apartment.apartment.rentPrice ? apartment.apartment.rentPrice +'$' : 'no price' }}  </td>
+      <td>
+        <p-button
+          icon="pi pi-pencil"
+          class="mr-2"
+          [rounded]="true"
+          [outlined]="true"
+          severity="success"
+          (onClick)="editApartment(apartment.apartment)"
+        />
+        <p-button
+          icon="pi pi-trash"
+          severity="danger"
+          [rounded]="true"
+          [outlined]="true"
+          (onClick)="deleteApartment(apartment)"
+        />
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="summary">
+    <div class="flex align-items-center justify-content-between">
+      In total there are {{ apartments ? apartments.length : 0 }} apartments.
+    </div>
+  </ng-template>
+</p-table>
+<p-dialog
+    [(visible)]="apartmentDialog"
+    [style]="{ width: '450px' }"
+    header="Apartment Details"
+    [modal]="true"
+    styleClass="p-fluid"
+  >
+    <ng-template pTemplate="content">
+      <div class="field p-nogutter">
+        <label for="image">Image</label>
+        <div class="p-fileupload-wrapper" style="width: 100%">
+          <p-fileUpload
+            [multiple]="true"
+            name="image"
+            accept="image/*"
+            [maxFileSize]="1000000"
+            (onSelect)="onImageUpload($event)"
+            [auto]="false"
+            chooseLabel="Select Image"
+          >
+          </p-fileUpload>
+        </div>
+      </div>
+      <div class="field">
+        <p-dropdown
+        [(ngModel)]="selectedBuilding"
+        [options]="dropdownBuildings"
+        [optionLabel]="'name'"
+        [required]="true"
+        placeholder="Select a Building for this Apartment"
+        >
+        </p-dropdown>
+        <small class="p-error" *ngIf="submitted && !apartment.number">Building is required.</small>
+      </div>
+      <div class="field">
+        <label for="number">Number</label>
+        <p-inputNumber 
+        id="number" 
+        [(ngModel)]="apartment.number"  
+        />
+        <small class="p-error" *ngIf="submitted && !apartment.number">
+          Number is required.
+        </small>
+      </div>
+      <div class="field">
+        <label for=" floor ">Floor</label>
+        <p-inputNumber 
+        id="floor" 
+        [(ngModel)]="apartment.floor"  
+        />
+        <small class="p-error" *ngIf="submitted && !apartment.floor">Floor is required.</small>
+      </div>
+      <div class="field">
+        <label for="size">Size</label>
+        <p-inputNumber 
+        id="size" 
+        [(ngModel)]="apartment.size"  
+        />
+        <small class="p-error" *ngIf="submitted && !apartment.size">Size is required.</small>
+        </div>
+      <div class="field">
+        <label for="bedroom"> Bedroom </label>
+        <p-inputNumber 
+        id="bedroom" 
+        [(ngModel)]="apartment.bedroom"  
+        />
+        <small class="p-error" *ngIf="submitted && !apartment.bedroom">Bedroom is required.</small>
+      </div>
+      <div class="field">
+        <label for="bathromm"> Bathroom </label>
+        <p-inputNumber 
+        id="bathroom" 
+        [(ngModel)]="apartment.bathroom"  
+        />
+        <small class="p-error" *ngIf="submitted && !apartment.bathroom">Bathroom is required.</small>
+      </div>
+      <div class="field">
+        <label for="description"> Description </label>
+        <textarea
+        pInputTextarea
+        [(ngModel)]="apartment.description"
+        required
+        rows="3"
+        cols="20"
+        id="description">
+        </textarea>
+      </div>
+      <div class="field">
+        <label for="price"> Rent Price </label>
+        <p-inputNumber 
+        id="price" 
+        [(ngModel)]="apartment.rentPrice"
+        />
+      </div>
+      <div class="field">
+        <p-checkbox
+        label="Furnished"
+        name="furnished"
+        [(ngModel)]="apartment.isFurnished"
+        value="true"
+        />        
+      </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancel"
+        icon="pi pi-times"
+        [text]="true"
+        (onClick)="hideDialog()"
+      />
+      <p-button
+        label="Save"
+        icon="pi pi-check"
+        [text]="true"
+        (onClick)="saveApartment()"
+      />
+    </ng-template>
+  </p-dialog>
+  <p-confirmDialog [style]="{ width: '450px' }" />
+</div>
+
+  
+

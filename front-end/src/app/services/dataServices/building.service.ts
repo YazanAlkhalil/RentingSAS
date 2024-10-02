@@ -43,7 +43,6 @@ export class BuildingService {
   }
   return query.find()
 }
-
   async addBuilding(data:{
     name:string,
     company_id:Pointer,
@@ -58,11 +57,22 @@ export class BuildingService {
     building.address = data.address
     building.location = data.location
     building.img = data.img
+    building.apartment = data.apartments
     return building.save()
   }
-
    deleteBuilding( building: Building ){
     return building.destroy()
   }
+
+  getBuilding(buildingId: string): Promise<Building | undefined>  {
+    const query = new Query(Building);
+    query.equalTo('objectId', buildingId);
+    return query.first();
+  }
+  
+  updateBuilding(building: Building): Promise<Building> {
+    return building.save();
+  }
+  
 }
   

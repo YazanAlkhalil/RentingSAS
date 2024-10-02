@@ -1,5 +1,6 @@
 import Parse from "parse";
 export interface Apartment {
+    [x: string]: any;
     _id: string;
     number: string;
     floor: number;
