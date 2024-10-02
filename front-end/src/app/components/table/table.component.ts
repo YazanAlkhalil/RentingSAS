@@ -156,7 +156,7 @@ export class TableComponent implements OnInit {
   }
 
   hideDialog() {  
-    this.company.fetch()  
+    this.company.revert()  
     this.companyDialog = false;
     this.submitted = false;
   }
@@ -253,7 +253,7 @@ export class TableComponent implements OnInit {
   }
 
   hideAddUserDialog() {
-    this.newUser.fetch()
+    this.newUser.revert()
     this.addUserDialog = false;    
     this.cd.detectChanges()
   }

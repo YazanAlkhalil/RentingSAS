@@ -37,13 +37,18 @@ export const routes: Routes = [
       },
       {
         path: "main",
-        // canActivate: [authGuard],
-        // canActivateChild: [authGuard],
+        canActivate: [authGuard],
+        canActivateChild: [authGuard],
         loadComponent: () =>
           import("./components/layouts/main-layout/main-layout.component").then(
             (m) => m.MainLayoutComponent
           ),
           children:[
+            {
+              path:"",
+              redirectTo: "buildings",
+              pathMatch: "full"
+            },
             {
               path:"buildings",
               loadComponent: () => 
