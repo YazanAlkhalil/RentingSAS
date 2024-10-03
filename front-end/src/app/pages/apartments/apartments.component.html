@@ -210,32 +210,30 @@
       </div>
       <div class="field  p-fluid">
         <p-dropdown
-        [(ngModel)]="selectedBuilding"
-        [options]="dropdownBuildings"
-        [optionLabel]="'name'"
-        [required]="true"
-        placeholder="Select a Building for this Apartment"
+          [(ngModel)]="selectedBuilding"
+          [options]="dropdownBuildings"
+          [optionLabel]="'name'"
+          [required]="true"
+          placeholder="Select a Building for this Apartment"
         >
         </p-dropdown>
-        <small class="p-error" *ngIf="submitted && !apartment.number">Building is required.</small>
+        <small class="p-error" *ngIf="submitted && !selectedBuilding"
+          >Building is required.</small
+        >
       </div>
       <div class="field  p-fluid">
         <label for="number">Number</label>
-        <p-inputNumber 
-        id="number" 
-        [(ngModel)]="apartment.number"  
-        />
+        <p-inputNumber id="number" [(ngModel)]="apartment.number" />
         <small class="p-error" *ngIf="submitted && !apartment.number">
           Number is required.
         </small>
       </div>
       <div class="field  p-fluid">
         <label for=" floor ">Floor</label>
-        <p-inputNumber 
-        id="floor" 
-        [(ngModel)]="apartment.floor"  
-        />
-        <small class="p-error" *ngIf="submitted && !apartment.floor">Floor is required.</small>
+        <p-inputNumber id="floor" [(ngModel)]="apartment.floor" />
+        <small class="p-error" *ngIf="submitted && !apartment.floor"
+          >Floor is required.</small
+        >
       </div>
       <div class="field  p-fluid">
         <label for="size">Size</label>
@@ -247,37 +245,33 @@
         </div>
       <div class="field  p-fluid">
         <label for="bedroom"> Bedroom </label>
-        <p-inputNumber 
-        id="bedroom" 
-        [(ngModel)]="apartment.bedroom"  
-        />
-        <small class="p-error" *ngIf="submitted && !apartment.bedroom">Bedroom is required.</small>
+        <p-inputNumber id="bedroom" [(ngModel)]="apartment.bedroom" />
+        <small class="p-error" *ngIf="submitted && !apartment.bedroom"
+          >Bedroom is required.</small
+        >
       </div>
       <div class="field  p-fluid">
         <label for="bathromm"> Bathroom </label>
-        <p-inputNumber 
-        id="bathroom" 
-        [(ngModel)]="apartment.bathroom"  
-        />
-        <small class="p-error" *ngIf="submitted && !apartment.bathroom">Bathroom is required.</small>
+        <p-inputNumber id="bathroom" [(ngModel)]="apartment.bathroom" />
+        <small class="p-error" *ngIf="submitted && !apartment.bathroom"
+          >Bathroom is required.</small
+        >
       </div>
       <div class="field  p-fluid">
         <label for="description"> Description </label>
         <textarea
-        pInputTextarea
-        [(ngModel)]="apartment.description"
-        required
-        rows="3"
-        cols="20"
-        id="description">
+          pInputTextarea
+          [(ngModel)]="apartment.description"
+          required
+          rows="3"
+          cols="20"
+          id="description"
+        >
         </textarea>
       </div>
       <div class="field  p-fluid">
         <label for="price"> Rent Price </label>
-        <p-inputNumber 
-        id="price" 
-        [(ngModel)]="apartment.rentPrice"
-        />
+        <p-inputNumber id="price" [(ngModel)]="apartment.rentPrice" />
       </div>
       <div class="field p-fluid">
         <label for="amenities">Amenities</label>
@@ -292,11 +286,11 @@
       </div>
       <div class="field  p-fluid">
         <p-checkbox
-        label="Furnished"
-        name="furnished"
-        [(ngModel)]="apartment.isFurnished"
-        value="true"
-        />        
+          label="Furnished"
+          name="furnished"
+          [(ngModel)]="apartment.isFurnished"
+          value="true"
+        />
       </div>
       
     </ng-template>
@@ -325,6 +319,208 @@
         </div>
       </div>
     </div>
+  </p-dialog>
+
+  <p-dialog
+    [(visible)]="contractDialog"
+    [style]="{ width: '450px' }"
+    header="Contract Details"
+    [modal]="true"
+  >
+  <div class="my-4">
+    <p-button
+    [hidden]="!isContract"
+    severity="danger"
+    label="Delete Contract"
+    icon="pi pi-trash"
+    (onClick)="deleteContract()"
+  />
+  <p-button
+    [hidden]="isContract"
+    label="Add Contract"
+    icon="pi pi-plus"
+    (onClick)="formVisible()"
+  />
+</div>
+    <ng-template pTemplate="content">
+      <div [hidden]="!isContract">
+      <div class="field p-fluid mt-2">
+        <label for="s-date">Start Date</label>
+        <p-calendar
+          id="s-date"
+          [(ngModel)]="contract.startDate"
+          [required]="true"
+        />
+        <small class="p-error" *ngIf="submitted && !contract.startDate">
+          Start Date is required.
+        </small>
+      </div>
+      <div class="field p-fluid">
+        <label for="e-date">End Date</label>
+        <p-calendar
+          id="e-date"
+          [(ngModel)]="contract.endDate"
+          [required]="true"
+        />
+        <small class="p-error" *ngIf="submitted && !contract.endDate">
+          End Date is required.
+        </small>
+      </div>
+      <div class="field p-fluid">
+        <label for="rent">Rent Amount</label>
+        <p-inputNumber
+          id="rent"
+          [(ngModel)]="contract.rentAmount"
+          [required]="true"
+        />
+        <small class="p-error" *ngIf="submitted && !contract.rentAmount"
+          >Rent Amount is required.</small
+        >
+      </div>
+      <div class="field p-fluid">
+        <p-dropdown
+          [(ngModel)]="selectedPaymentFrequency"
+          [options]="paymentFrequencyOptions"
+          [optionLabel]="'name'"
+          [required]="true"
+          placeholder="Select a payment method"
+        >
+        </p-dropdown>
+        <small class="p-error" *ngIf="submitted && !selectedPaymentFrequency"
+          >Payment Frequency is required.</small
+        >
+      </div>
+      <div class="field p-fluid">
+        <label for="deposit"> Deposit </label>
+        <p-inputNumber
+          id="deposit"
+          [(ngModel)]="contract.deposit"
+          [required]="true"
+        />
+        <small class="p-error" *ngIf="submitted && !contract.deposit"
+          >Deposit is required.</small
+        >
+      </div>
+      <div class="field p-fluid">
+        <label for="m-terms"> Maintenance Terms </label>
+        <textarea
+          pInputTextarea
+          [(ngModel)]="contract.maintenanceTerms"
+          required
+          rows="3"
+          cols="20"
+          id="m-terms"
+        >
+        </textarea>
+      </div>
+      <div class="field p-fluid">
+        <label for="s-terms"> Special Terms </label>
+        <textarea
+          pInputTextarea
+          [(ngModel)]="contract.specialTerms"
+          required
+          rows="3"
+          cols="20"
+          id="s-terms"
+        >
+        </textarea>
+      </div>
+      <div class="field p-fluid">
+        <p-multiSelect
+          [(ngModel)]="contract.utilitiesToPay"
+          [options]="utilitiesToPayOptions"
+          [optionLabel]="'name'"
+          [required]="false"
+          placeholder="Select utilities To Pay"
+        >
+        </p-multiSelect>
+      </div>
+      <div class="field p-nogutter">
+        <label for="image">Client Image</label>
+        <div class="p-fileupload-wrapper" style="width: 100%">
+          <p-fileUpload
+            [multiple]="false"
+            name="image"
+            accept="image/*"
+            [maxFileSize]="1000000"
+            (onSelect)="onImageUpload($event)"
+            [auto]="false"
+            chooseLabel="Select Image"
+          >
+          </p-fileUpload>
+        </div>
+      </div>
+      <div class="field p-fluid">
+        <label for="c-name"> Client Name </label>
+        <input
+          type="text"
+          pInputText
+          id="c-name"
+          [(ngModel)]="contract.client.name"
+          [required]="true"
+        />
+        <small class="p-error" *ngIf="submitted && !contract.client.name"
+          >Client Name is required.</small
+        >
+      </div>
+      <div class="field p-fluid">
+        <label for="c-phone"> Client phone </label>
+        <p-inputNumber
+          id="c-phone"
+          [(ngModel)]="contract.client.contactInfo.phone"
+          [required]="true"
+        />
+        <small
+          class="p-error"
+          *ngIf="submitted && !contract.client.contactInfo.phone"
+          >Client Phone is required.</small
+        >
+      </div>
+      <div class="field p-fluid">
+        <label for="c-email"> Client email </label>
+        <input
+          type="email"
+          pInputText
+          id="c-email"
+          [(ngModel)]="contract.client.contactInfo.email"
+          [required]="true"
+        />
+        <small
+          class="p-error"
+          *ngIf="submitted && !contract.client.contactInfo.email"
+          >Client Email is required.</small
+        >
+      </div>
+      <div class="field p-fluid">
+        <label for="infos"> Additional Infos </label>
+        <textarea
+          pInputTextarea
+          [(ngModel)]="contract.additionalInfo"
+          rows="3"
+          cols="20"
+          id="infos"
+        >
+        </textarea>
+      </div>
+    </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <div [hidden]="!isContract">
+      <p-button
+        label="Cancel"
+        icon="pi pi-times"
+        [text]="true"
+        (onClick)="cancel()"
+      />
+      <p-button
+        label="Save"
+        icon="pi pi-check"
+        [text]="true"
+        (onClick)="saveContract()"
+      />
+    </div>
+    </ng-template>
+    
   </p-dialog>
   <p-confirmDialog [style]="{ width: '450px' }" />
 </div>

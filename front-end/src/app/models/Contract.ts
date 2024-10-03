@@ -1,11 +1,26 @@
 import { Client } from "./Interfaces/Client";
 import { Payment } from "./Interfaces/Payment";
-
+import Parse, { Pointer } from "parse";
 
 export class Contract extends Parse.Object {
   constructor() {
     super('Contract');
-    
+    this.set('client' , {name:'' ,'contactInfo':{phone:'' , email:''} , img:''})
+  }
+
+  get company_id(): Pointer{
+    return this.get('company_id')
+  }
+
+  set company_id(value: Pointer){
+    this.set('company_id' , value)
+  }
+  get building_id(): Pointer{
+    return this.get('company_id')
+  }
+
+  set building_id(value: Pointer){
+    this.set('company_id' , value)
   }
 
   get startDate(): Date {
@@ -72,11 +87,11 @@ export class Contract extends Parse.Object {
     this.set('client', value);
   }
 
-  get apartment_id(): Parse.Pointer {
+  get apartment_id(): string {
     return this.get('apartment_id');
   }
 
-  set apartment_id(value: Parse.Pointer) {
+  set apartment_id(value: string) {
     this.set('apartment_id', value);
   }
 
