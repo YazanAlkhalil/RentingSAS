@@ -9,12 +9,13 @@ import { FormsModule } from '@angular/forms';
 import { AvatarModule } from 'primeng/avatar';
 import { Report } from '../../models/Report';
 import { Apartment } from '../../models/Interfaces/Apartment';
+import { ReportService } from '../../services/dataServices/report.service';
 @Component({
     selector: 'app-reports',
     templateUrl: './reports.component.html',
     standalone: true,
     imports: [CommonModule,TableModule,ButtonModule,FormsModule ,AvatarModule,InputTextModule],
-    providers: [],
+    providers: [ReportService],
     styles: [
     `
     :host ::ng-deep {
@@ -125,30 +126,20 @@ export class ReportsComponent implements OnInit {
     reports!: any[];
     loading: boolean = true;
 
-    constructor(private cd: ChangeDetectorRef) {}
+    constructor(private cd: ChangeDetectorRef,private reportService:ReportService) {}
 
     ngOnInit() {
-        const company_id = Parse.User.current()?.attributes["company_id"];
-        if(!company_id) return;
-        const query = new Parse.Query(Report);
-        query.equalTo('company_id', company_id);
-        query.include('building_id');
-        query.include('user_id');
-        query.find().then((reports) => {
-        this.reports = reports;
-        this.reports.forEach(report => {
-            report.set('apartment_id',report.get('building_id').attributes.apartment.find((apartment:Apartment) => apartment._id === report.get('apartment_id')));
-        })
-        // this.reports = reports.map(report => {return{...report,apartment_id:report.get('building_id').attributes.apartment.find((apartment:Apartment) => apartment._id === report.get('apartment_id'))}});;
-        console.log(this.reports);
-        
-        this.loading = false;
-        this.cd.detectChanges();
-        }).catch((error) => {
-        console.log(error);
-        });
-        
+        if (!this.reports) {
+            console.log(this.reportService.fetchReports());
+            
+            this.reportService.fetchReports().then((reports)=>{
+                this.reports = reports
+                console.log(this.reports,'ee');
+                
+                this.cd.detectChanges()
+            });
+        }
     }
-
+   
     // Remove unused methods
 }

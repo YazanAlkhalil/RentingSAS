@@ -61,6 +61,7 @@
       <th>
         <p-tableHeaderCheckbox />
       </th>
+      <th pSortableColumn="name">Name <p-sortIcon field="name"/></th>
       <th pSortableColumn="buildingName">Building Name <p-sortIcon field="buildingName"/></th>
       <th pSortableColumn="apartment.floor"> Floor <p-sortIcon field="apartment.floor"/></th>
       <th pSortableColumn="apartment.size">Size<p-sortIcon field="apartment.size"/></th>
@@ -76,6 +77,9 @@
     <tr class="text-2xl">
       <td>
         <p-tableCheckbox [value]="apartment" />
+      </td>
+      <td>
+        {{ apartment.apartment.name }} 
       </td>
       <td>
         {{ apartment.buildingName }} 
@@ -130,6 +134,14 @@
           [outlined]="true"
           (onClick)="deleteApartment(apartment)"
         />
+        <p-button
+        [hidden]="apartment.apartment.status !== 'available'"
+        icon="pi pi-plus"
+        severity="primary"
+        [rounded]="true"
+        [outlined]="true"
+        (onClick)="addContract(apartment)"
+      />
       </td>
     </tr>
   </ng-template>
@@ -156,7 +168,7 @@
         </p-carousel>
       </div>
       <div class="col-12">
-        <h2>Apartment {{ apartment.number }}</h2>
+        <h2>{{apartment.name}}</h2>
         <div class="grid text-2xl">
           <div class="col-6">
             <p><strong>Floor:</strong> {{ apartment.floor }}</p>
@@ -168,13 +180,14 @@
             <p><strong>Furnished:</strong> {{ apartment.isFurnished ? 'Yes' : 'No' }}</p>
             <p><strong>Status:</strong> {{ apartment.status }}</p>
             <p><strong>Rent Price:</strong> {{ apartment.rentPrice | currency:'USD' }}</p>
-            <p><strong>Description:</strong> {{ apartment.description }}</p>
+            <p><strong>Apartment Number:</strong> {{ apartment.number }}</p>
           </div>
           <div class="col-6">
             <p><strong>Amenities:</strong></p>
             <ul>
               <li *ngFor="let amenity of apartment.amenities">{{ $any(amenity).name }}</li>
             </ul>
+            <p><strong>Description:</strong> {{ apartment.description }}</p>
           </div>
         </div>
       </div>
@@ -207,6 +220,13 @@
           </p-fileUpload>
         </div>
         
+      </div>
+      <div class="field  p-fluid">
+        <label for="name">Name</label>
+        <input id="name" type="text" pInputText [(ngModel)]="apartment.name" />
+        <small class="p-error" *ngIf="submitted && !apartment.name">
+          Name is required.
+        </small>
       </div>
       <div class="field  p-fluid">
         <p-dropdown
@@ -293,6 +313,7 @@
         />
       </div>
       
+      
     </ng-template>
     <ng-template pTemplate="footer">
       <p-button
@@ -333,6 +354,7 @@
     severity="danger"
     label="Delete Contract"
     icon="pi pi-trash"
+    [disabled]="!contractInfos()"
     (onClick)="deleteContract()"
   />
   <p-button
@@ -397,9 +419,7 @@
           [(ngModel)]="contract.deposit"
           [required]="true"
         />
-        <small class="p-error" *ngIf="submitted && !contract.deposit"
-          >Deposit is required.</small
-        >
+        
       </div>
       <div class="field p-fluid">
         <label for="m-terms"> Maintenance Terms </label>

@@ -178,6 +178,7 @@ export class ApartmentsComponent {
     this.apartmentDialog = true;
     this.apartment = {
       _id: "",
+      name:"",
       number: "",
       floor: 0,
       size: "",
@@ -220,6 +221,7 @@ export class ApartmentsComponent {
     this.cd.detectChanges();
   }
   async saveApartment() {
+
     this.submitted = true;
     
     if (
@@ -259,15 +261,26 @@ export class ApartmentsComponent {
         this.apartment.amenities = this.selectedAmenities;
         this.buildings[buildingIndex].apartment.push(this.apartment);
         await this.buildings[buildingIndex].save()
-        const buildingPointer = new Parse.Object('Building')
-        buildingPointer.id = this.selectedBuilding.id
+        
+        // Get the building name
+        const buildingName = this.buildings[buildingIndex].get('name');
+        
+        // Get the company name
+        const companyName = this.authService.getCurrentUser()?.get('company_id').get('name');
+        
+        // Get the username
+        const username = this.authService.getCurrentUser()?.get('username');
+        
         const report = new Parse.Object('Report')
-        report.set('apartment_id',this.apartment._id)
-        report.set('building_id',buildingPointer)
-        report.set('company_id',this.authService.getCurrentUser()?.get('company_id'))
-        report.set('user_id',this.authService.getCurrentUser()?.toPointer())
+        report.set('apartment_name', this.apartment.name)
+        report.set('building_name', buildingName) 
+        report.set('company_name', companyName)   
+        report.set('username', username) 
         report.set('type','new_apartment')
+        console.log(report,'report');
+        
         await report.save()
+        
         this.msg.add({
           severity: "success",
           summary: "Successful",
@@ -346,6 +359,7 @@ export class ApartmentsComponent {
   cancel(): void {
     this.submitted = false;
     this.contract.revert();
+    this.isContract = false;
     this.contractDialog = false;
   }
 
@@ -354,35 +368,64 @@ export class ApartmentsComponent {
     buildingId: string;
     buildingName: string;
   }) {
-    this.contractDialog = true;
-    this.contract = new Contract();
+    const contractQuery = new Parse.Query(Contract)
+    contractQuery.equalTo('apartment_id',apartment.apartment._id)
+    contractQuery.first().then((contract :Contract | undefined)=>{
+      if(contract){
+        this.contract = contract
+        this.isContract = true
+        this.contractDialog = true;
+        this.cd.detectChanges()
+        
+      }
+      else{
+        this.contractDialog = true;
+        this.contract = new Contract();
+        this.isContract = false
+        this.cd.detectChanges()
+      }
+    })
     this.submitted = false;
     this.selectedApartment = apartment;
+    this.cd.detectChanges()
   }
   saveContract() {
+    this.submitted = true; 
     if (
-      this.contract.startDate &&
-      this.contract.endDate &&
-      this.contract.rentAmount &&
-      this.contract.deposit &&
-      this.contract.paymentFrequency &&
-      this.contract.client.name &&
-      this.contract.client.contactInfo.email &&
-      this.contract.client.contactInfo.phone
-    ) {
+      this.contract.get("startDate") &&
+      this.contract.get("endDate") &&
+      this.contract.get("rentAmount") &&
+      this.selectedPaymentFrequency &&
+      this.contract.get("client").name &&
+      this.contract.get("client").contactInfo.email &&
+      this.contract.get("client").contactInfo.phone
+    ) {   
+      if(this.contract.id){
+         this.contract.save().then(()=>{
+          this.contractDialog = false;
+          this.msg.add({
+            severity: "success",
+            summary: "Successful",
+            detail: "Contract Updated",
+            life: 3000,
+          });
+          this.cd.detectChanges()
+         })
+         return 
+      }
       this.contractService.addContract(this.contract, this.selectedApartment);
       console.log(this.contract, "contract");
       this.msg.add({
         severity: "success",
         summary: "Successful",
-        detail: "Contract Updated",
+        detail: "Contract Created",
         life: 3000,
       });
       this.contractDialog = false;
     }
   }
   formVisible() {
-    this.isContract = !this.isContract;
+    this.isContract = true;
     console.log(this.isContract, "css");
   }
   editContract(contract: Contract) {
@@ -394,12 +437,16 @@ export class ApartmentsComponent {
       header: "Confirm",
       icon: "pi pi-exclamation-triangle",
       accept: () => {
-        this.contractService.deleteContract(this.contract);
-        this.msg.add({
-          severity: "success",
-          summary: "Successful",
-          detail: "Contract Deleted",
-          life: 3000,
+        this.contractService.deleteContract(this.contract).then(()=>{
+          this.contractDialog = false;
+          this.msg.add({
+            severity: "success",
+            summary: "Successful",
+            detail: "Contract Deleted",
+            life: 3000,
+          });
+          this.isContract = false
+          this.cd.detectChanges()
         });
       },
     });
@@ -409,20 +456,19 @@ export class ApartmentsComponent {
   openImagesDialog() {
     this.imagesDialog = true;
   }
-  // contractInfos() {
-  //   if (
-  //     this.contract.startDate !== null &&
-  //     this.contract.endDate !== null &&
-  //     this.contract.rentAmount !== null &&
-  //     this.contract.deposit !== null &&
-  //     this.contract.paymentFrequency !== null &&
-  //     this.contract.client.name !== null &&
-  //     this.contract.client.contactInfo.email !== null &&
-  //     this.contract.client.contactInfo.phone !== null 
-  //   ) {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // }
+  contractInfos() {
+    if (
+      this.contract.get("startDate") &&
+    this.contract.get("endDate") &&
+    this.contract.get("rentAmount") &&
+    this.selectedPaymentFrequency &&
+    this.contract.get("client").name &&
+    this.contract.get("client").contactInfo.email &&
+    this.contract.get("client").contactInfo.phone
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

@@ -3,36 +3,36 @@ export class Report extends Parse.Object {
     super('Report');
   }
 
-  get company_id(): Parse.Pointer {
-    return this.get('company_id');
+  get company_name(): string {
+    return this.get('company_name');
   }
 
-  set company_id(value: Parse.Pointer) {
-    this.set('company_id', value);
+  set company_name(value: string) {
+    this.set('company_name', value);
   }
 
-  get building_id(): Parse.Pointer {
-    return this.get('building_id');
+  get building_name(): string {
+    return this.get('building_name');
   }
 
-  set building_id(value: Parse.Pointer) {
-    this.set('building_id', value);
+  set building_name(value: string) {
+    this.set('building_name', value);
   }
 
-  get apartment_id(): Parse.Pointer {
-    return this.get('apartment_id');
+  get apartment_name(): string {
+    return this.get('apartment_name');
   }
 
-  set apartment_id(value: Parse.Pointer) {
-    this.set('apartment_id', value);
+  set apartment_name(value: string) {
+    this.set('apartment_name', value);
   }
 
-  get user_id(): Parse.Pointer {
-    return this.get('user_id');
+  get user_name(): string {
+    return this.get('user_name');
   }
 
-  set user_id(value: Parse.Pointer) {
-    this.set('user_id', value);
+  set user_name(value: string) {
+    this.set('user_name', value);
   }
 
   get action(): string {
