@@ -404,6 +404,11 @@ export class ApartmentsComponent {
       },
     });
   }
+  imagesDialog: boolean = false;
+
+  openImagesDialog() {
+    this.imagesDialog = true;
+  }
   // contractInfos() {
   //   if (
   //     this.contract.startDate !== null &&
