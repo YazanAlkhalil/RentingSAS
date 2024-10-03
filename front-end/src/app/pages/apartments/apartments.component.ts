@@ -31,11 +31,11 @@ import { ConfirmationService, MessageService } from "primeng/api";
 import Parse from "parse";
 import { AuthService } from "../../services/other/auth.service";
 import { BuildingService } from "../../services/dataServices/building.service";
-import { CarouselModule } from 'primeng/carousel';
-import { MultiSelectModule } from 'primeng/multiselect';
 import { Contract } from "../../models/Contract";
+import { MultiSelectModule } from "primeng/multiselect";
 import { ContractService } from "../../services/dataServices/contract.service";
 import { CalendarModule } from "primeng/calendar";
+import { CarouselModule } from 'primeng/carousel';
 
 @Component({
   selector: "app-apartments",
@@ -61,9 +61,9 @@ import { CalendarModule } from "primeng/calendar";
     CheckboxModule,
     InputNumberModule,
     DropdownModule,
-    CarouselModule,
     MultiSelectModule,
     CalendarModule,
+    CarouselModule,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: "./apartments.component.html",
@@ -88,6 +88,7 @@ export class ApartmentsComponent {
   selectedBuilding!:{ name: string; id: string };
   apartment!: Apartment;
   submitted: boolean = false;
+  selectedPaymentFrequency!: string;
   moreDetailsDialog: boolean = false
   amenitiesOptions = [
     { name: 'Air Conditioning', value: 'Air Conditioning' },
@@ -278,8 +279,6 @@ export class ApartmentsComponent {
         this.cd.detectChanges()
       }
     }
-    this.buildings = [... this.buildings]
-    this.cd.detectChanges();
   }
   editApartment(apartment: {apartment:Apartment,buildingName:string,buildingId:string}) {
     this.selectedBuilding = {name:apartment.buildingName,id:apartment.buildingId}
