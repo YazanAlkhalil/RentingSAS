@@ -103,6 +103,8 @@ export class BuildingsComponent {
 
   openNew() {
     this.building = new Building();
+    console.log(this.building,'bb');
+    
     this.submitted = false;
     this.buildingDialog = true;
   }
@@ -182,14 +184,7 @@ export class BuildingsComponent {
       } else {
         try {
           this.buildingService
-            .addBuilding({
-              company_id: this.data.company_id,
-              name: this.building.name,
-              address: this.building.address,
-              location: this.building.location,
-              img: this.building.img,
-              apartments:[]
-            })
+            .addBuilding(this.building)
             .then((building) => {
               this.buildings.push(building);
               this.messageService.add({
