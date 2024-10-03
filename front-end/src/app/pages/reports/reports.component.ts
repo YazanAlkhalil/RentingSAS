@@ -8,6 +8,7 @@ import Parse from 'parse';
 import { FormsModule } from '@angular/forms';
 import { AvatarModule } from 'primeng/avatar';
 import { Report } from '../../models/Report';
+import { Apartment } from '../../models/Interfaces/Apartment';
 @Component({
     selector: 'app-reports',
     templateUrl: './reports.component.html',
@@ -121,7 +122,7 @@ import { Report } from '../../models/Report';
     ],
 })
 export class ReportsComponent implements OnInit {
-    reports!: Report[];
+    reports!: any[];
     loading: boolean = true;
 
     constructor(private cd: ChangeDetectorRef) {}
@@ -131,16 +132,20 @@ export class ReportsComponent implements OnInit {
         if(!company_id) return;
         const query = new Parse.Query(Report);
         query.equalTo('company_id', company_id);
-        query.include('apartment_id');
         query.include('building_id');
         query.include('user_id');
         query.find().then((reports) => {
-          
-          this.reports = reports;
-          this.loading = false;
-          this.cd.detectChanges();
+        this.reports = reports;
+        this.reports.forEach(report => {
+            report.set('apartment_id',report.get('building_id').attributes.apartment.find((apartment:Apartment) => apartment._id === report.get('apartment_id')));
+        })
+        // this.reports = reports.map(report => {return{...report,apartment_id:report.get('building_id').attributes.apartment.find((apartment:Apartment) => apartment._id === report.get('apartment_id'))}});;
+        console.log(this.reports);
+        
+        this.loading = false;
+        this.cd.detectChanges();
         }).catch((error) => {
-          console.log(error);
+        console.log(error);
         });
         
     }

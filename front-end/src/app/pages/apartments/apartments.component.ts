@@ -233,7 +233,7 @@ export class ApartmentsComponent {
         report.set('apartment_id',this.apartment._id)
         report.set('building_id',buildingPointer)
         report.set('company_id',this.authService.getCurrentUser()?.get('company_id'))
-        report.set('user_id',this.authService.getCurrentUser()?.id)
+        report.set('user_id',this.authService.getCurrentUser()?.toPointer())
         report.set('type','new_apartment')
         await report.save()
         this.msg.add({
