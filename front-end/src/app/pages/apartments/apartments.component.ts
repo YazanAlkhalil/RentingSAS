@@ -36,6 +36,7 @@ import { MultiSelectModule } from "primeng/multiselect";
 import { ContractService } from "../../services/dataServices/contract.service";
 import { CalendarModule } from "primeng/calendar";
 import { CarouselModule } from 'primeng/carousel';
+import { Company } from "../../models/Company";
 
 @Component({
   selector: "app-apartments",
