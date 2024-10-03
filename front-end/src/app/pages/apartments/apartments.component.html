@@ -61,15 +61,15 @@
       <th>
         <p-tableHeaderCheckbox />
       </th>
-      <th pSortableColumn="buildingName">Building Name <p-sortIcon field="buildingName"/></th>
-      <th pSortableColumn="apartment.floor"> Floor <p-sortIcon field="apartment.floor"/></th>
-      <th pSortableColumn="apartment.size">Size<p-sortIcon field="apartment.size"/></th>
-      <th pSortableColumn="apartment.status">Status<p-sortIcon field="apartment.status"/></th>
-      <th pSortableColumn="apartment.isFurnished">Furnished<p-sortIcon field="apartment.isFurnished"/></th>
-      <th pSortableColumn="apartment.bedroom">Bedroom<p-sortIcon field="apartment.bedroom"/></th>
-      <th pSortableColumn="apartment.bathroom">Bathroom<p-sortIcon field="apartment.bathroom"/></th>
-      <th pSortableColumn="apartment.rentPrice">Rent Price<p-sortIcon field="apartment.rentPrice"/></th>
-      <th>Processes</th>
+      <th pSortableColumn="buildingName" class="text-2xl">Building Name <p-sortIcon field="buildingName"/></th>
+      <th pSortableColumn="apartment.floor" class="text-2xl"> Floor <p-sortIcon field="apartment.floor"/></th>
+      <th pSortableColumn="apartment.size" class="text-2xl">Size<p-sortIcon field="apartment.size"/></th>
+      <th pSortableColumn="apartment.status" class="text-2xl">Status<p-sortIcon field="apartment.status"/></th>
+      <th pSortableColumn="apartment.isFurnished" class="text-2xl">Furnished<p-sortIcon field="apartment.isFurnished"/></th>
+      <th pSortableColumn="apartment.bedroom" class="text-2xl">Bedroom<p-sortIcon field="apartment.bedroom"/></th>
+      <th pSortableColumn="apartment.bathroom" class="text-2xl">Bathroom<p-sortIcon field="apartment.bathroom"/></th>
+      <th pSortableColumn="apartment.rentPrice" class="text-2xl">Rent Price<p-sortIcon field="apartment.rentPrice"/></th>
+      <th class="text-2xl">Processes</th>
     </tr> </ng-template
   >0.0
   <ng-template pTemplate="body" let-apartment>
@@ -125,11 +125,20 @@
         />
         <p-button
           icon="pi pi-trash"
+          class="mr-2"
           severity="danger"
           [rounded]="true"
           [outlined]="true"
           (onClick)="deleteApartment(apartment)"
         />
+        <p-button
+        [hidden]="apartment.apartment.status !== 'available'"
+        icon="pi pi-plus"
+        severity="primary"
+        [rounded]="true"
+        [outlined]="true"
+        (onClick)="addContract(apartment)"
+      />
       </td>
     </tr>
   </ng-template>

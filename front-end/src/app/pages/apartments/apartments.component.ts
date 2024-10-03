@@ -36,6 +36,7 @@ import { MultiSelectModule } from "primeng/multiselect";
 import { ContractService } from "../../services/dataServices/contract.service";
 import { CalendarModule } from "primeng/calendar";
 import { CarouselModule } from 'primeng/carousel';
+import { Company } from "../../models/Company";
 
 @Component({
   selector: "app-apartments",
@@ -356,8 +357,10 @@ export class ApartmentsComponent {
   }) {
     this.contractDialog = true;
     this.contract = new Contract();
+    console.log(this.contract , 'cn');
     this.submitted = false;
     this.selectedApartment = apartment;
+    console.log(this.selectedApartment,'selected');
   }
   saveContract() {
     if (
