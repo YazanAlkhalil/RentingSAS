@@ -67,17 +67,17 @@
       </tr> </ng-template
     >0.0
     <ng-template pTemplate="body" let-building>
-      <tr>
+      <tr class="text-2xl">
         <td>
           <p-tableCheckbox [value]="building" />
         </td>
-        <td class="text-lg">
+        <td>
           {{ building.name }}
         </td>
-        <td class="text-lg">
+        <td>
           {{ building.address }}
         </td>
-        <td class="text-lg">
+        <td>
           {{ building.location.longitude }} , {{ building.location.latitude }}
         </td>
         <td>
