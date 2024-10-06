@@ -76,13 +76,13 @@ export class SidebarComponent implements OnInit {
     },
     {
       id:"clients",
-      icon:'pi pi-address-book',
+      icon:'fa-regular fa-handshake fa-xs',
       title:this.translateService.instant('clients'),
       routerLink: "/main/clients"
     },
     {
       id:"reports",
-      icon:'pi pi-chart-line',
+      icon:'pi pi-chart-line ',
       title:this.translateService.instant('reports'),
       routerLink: "/main/reports"
     }

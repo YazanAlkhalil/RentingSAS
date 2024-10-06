@@ -76,7 +76,7 @@ export class AdminService {
 
   getUsersByCompany(companyId: Parse.Pointer): Promise<User[]> {
     const query = new Query(User);
-    query.equalTo('company_id', companyId);
+    query.equalTo('company', companyId);
     return query.find();
   }
 

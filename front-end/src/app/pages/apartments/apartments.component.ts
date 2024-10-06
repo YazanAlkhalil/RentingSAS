@@ -11,9 +11,7 @@ import { Apartment } from "../../models/Apartment";
 import { TranslateModule } from "@ngx-translate/core";
 import { InputTextModule } from "primeng/inputtext";
 import {
-  FormArray,
-  FormControl,
-  FormGroup,
+
   FormsModule,
   ReactiveFormsModule,
 } from "@angular/forms";
@@ -36,7 +34,6 @@ import { MultiSelectModule } from "primeng/multiselect";
 import { ContractService } from "../../services/dataServices/contract.service";
 import { CalendarModule } from "primeng/calendar";
 import { CarouselModule } from "primeng/carousel";
-import { Company } from "../../models/Company";
 import { Expenses } from "../../models/Expenses";
 
 @Component({

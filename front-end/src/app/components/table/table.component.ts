@@ -311,7 +311,7 @@ export class TableComponent implements OnInit {
     }
     const company = new Company()
     company.id = this.selectedCompany.id
-    this.newUser.set('company_id', company);
+    this.newUser.set('company', company);
     console.log(this.newUser);
     
     this.adminService.addUser(this.newUser)
