@@ -5,6 +5,7 @@ export class Building extends Parse.Object {
   constructor() {
     super('Building');
     this.set('location' , { longitude: '' , latitude: '' })
+    this.set('apartment',[])
   }
   get company_id(): Parse.Pointer {
     return this.get('company_id');

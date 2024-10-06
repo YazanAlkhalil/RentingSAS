@@ -1,5 +1,5 @@
 <div class="card">
-    <p-table #dt [value]="reports" [rows]="10" [paginator]="true"
+    <p-table #dt [value]="reports" [rows]="10" 
         [globalFilterFields]="['attributes.apartment_id.name', 'attributes.building_id.name', 'attributes.user_id.username', 'attributes.createdAt','attributes.type']"
         [rowsPerPageOptions]="[10, 25, 50, 100]" [rowHover]="true" dataKey="id"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [showCurrentPageReport]="true">

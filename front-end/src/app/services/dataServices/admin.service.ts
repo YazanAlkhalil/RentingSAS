@@ -34,23 +34,34 @@ export class AdminService {
     }
 
   getCompanies(data:{
-    // skip:number,
-    // limit:number,
-    // sortField:string,
+    skip:number,
+    limit:number,
+    sortField:string,
+    sortOrder:'asc' | 'desc',
     searchValue:string,
     withCount:boolean
   }): Promise<{ results: Company[]; count: number } | Company[] | any > {
     let query = new Query(Company);
     if(data.searchValue){
-      const re = RegExp(`${data?.searchValue?.replace("+" , `\\+`).replace("-" , `\\-`)}`,"i")
-      const descQuery = new Query(Company).matches('description',re)
-      query = Query.or(descQuery)
+      const re = RegExp(`${data?.searchValue?.replace(/[+-.]/g, "\\$&")}`, "i");
+      const nameQuery = new Query(Company).matches('name', re);
+      const addressQuery = new Query(Company).matches('address', re);
+      const emailQuery = new Query(Company).matches('contactInfo.email', re);
+      const phoneQuery = new Query(Company).matches('contactInfo.phone', re);
+      query = Query.or(nameQuery, addressQuery, emailQuery, phoneQuery);
+    }
+    if (data.sortField) {
+      if (data.sortOrder === 'asc') {
+        query.ascending(data.sortField);
+      } else {
+        query.descending(data.sortField);
+      }
+    } else {
+      query.descending('createdAt');
     }
     query
-    // .descending(data.sortField)
-    // .skip(data.skip)
-    // .limit(data.limit)
-    .descending('createdAt')
+    .skip(data.skip)
+    .limit(data.limit)
     .include([
       'name',
       'address',

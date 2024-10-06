@@ -8,18 +8,19 @@
         </ng-template>
     </p-toolbar>
 
-    <p-table #dt [value]="companies" [rows]="10" [paginator]="true"
+    <p-table #dt [value]="companies" [rows]="10" 
         [globalFilterFields]="['name', 'address', 'contactInfo.phone', 'contactInfo.email']"
         [rowsPerPageOptions]="[10, 25, 50, 100]" [tableStyle]="{ 'min-width': '75rem' }"
         [(selection)]="selectedCompanies" [rowHover]="true" dataKey="id"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [showCurrentPageReport]="true">
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [showCurrentPageReport]="true"
+        (sortFunction)="onSort($event)" [customSort]="true">
         <ng-template pTemplate="caption">
             <div class="flex align-items-center justify-content-between">
                 <h5 class="m-0 text-2xl font-bold">Manage Companies</h5>
                 <span class="p-input-icon-left">
                     <i class="pi pi-search"></i>
-                    <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
-                        placeholder="Search..." />
+                    <input pInputText type="text" [(ngModel)]="searchValue" (input)="onSearchChange()"
+                           placeholder="Search..." />
                 </span>
             </div>
         </ng-template>
@@ -55,10 +56,10 @@
                 <td>
                     <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" severity="success"
                         (onClick)="editCompany(company)"></p-button>
-                        <p-button icon="pi pi-users" class="mr-2" [rounded]="true" [outlined]="true" severity="info"
+                    <p-button icon="pi pi-users" class="mr-2" [rounded]="true" [outlined]="true" severity="info"
                         (onClick)="manageUsers(company)"></p-button>
-                        <p-button icon="pi pi-trash" class="mr-2" severity="danger" [rounded]="true" [outlined]="true"
-                            (onClick)="deleteCompany(company)"></p-button>
+                    <p-button icon="pi pi-trash" class="mr-2" severity="danger" [rounded]="true" [outlined]="true"
+                        (onClick)="deleteCompany(company)"></p-button>
                 </td>
             </tr>
         </ng-template>
@@ -105,8 +106,8 @@
         </ng-template>
 
         <ng-template pTemplate="footer">
-            <p-button label="Cancel" icon="pi pi-times" [text]="true" (onClick)="hideDialog()" />
-            <p-button label="Save" icon="pi pi-check" [text]="true" (onClick)="saveCompany()" />
+            <p-button label="Cancel" icon="pi pi-times" severity="secondary"  [text]="true" (onClick)="hideDialog()" />
+            <p-button label="Save" icon="pi pi-check" severity="primary"  (onClick)="saveCompany()" />
         </ng-template>
     </p-dialog>
 
@@ -128,9 +129,8 @@
                 <ng-template pTemplate="body" let-user>
                     <tr>
                         <td>
-                            <p-avatar [image]="user.attributes.img?.url()" 
-                                      [icon]="user.attributes.img ? '' : 'pi pi-user'"
-                                      width="50">
+                            <p-avatar [image]="user.attributes.img?.url()"
+                                [icon]="user.attributes.img ? '' : 'pi pi-user'" width="50">
                             </p-avatar>
                         </td>
                         <td>{{user.attributes.username}}</td>
@@ -145,7 +145,7 @@
                     </tr>
                 </ng-template>
             </p-table>
-            
+
         </ng-template>
     </p-dialog>
 
@@ -177,10 +177,17 @@
             </div>
         </ng-template>
         <ng-template pTemplate="footer">
-            <p-button label="Cancel" icon="pi pi-times" [text]="true" (onClick)="hideAddUserDialog()"></p-button>
-            <p-button label="Save" icon="pi pi-check" [text]="true" (onClick)="saveUser()"></p-button>
+            <p-button label="Cancel" severity="secondary" icon="pi pi-times" [text]="true" (onClick)="hideAddUserDialog()"/>
+            <p-button label="Save" severity="primary" icon="pi pi-check"  (onClick)="saveUser()"/>
         </ng-template>
     </p-dialog>
 
     <p-confirmDialog [style]="{ width: '450px' }" />
 </div>
+
+<p-paginator 
+    (onPageChange)="onPageChange($event)" 
+    [first]="skip"
+    [rows]="limit" 
+    [totalRecords]="count" 
+    [rowsPerPageOptions]="[10, 25, 50,100]" />

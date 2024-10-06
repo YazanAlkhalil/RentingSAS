@@ -74,7 +74,18 @@ export const routes: Routes = [
                 import('./pages/reports/reports.component')
               .then( (m) => m.ReportsComponent )
             },
-
+            {
+              path:'clients',
+              loadComponent: () => 
+                import('./pages/clients/clients.component')
+              .then( (m) => m.ClientsComponent )
+            },
+            {
+              path:'contracts',
+              loadComponent: () => 
+                import('./pages/contracts/contracts.component')
+              .then( (m) => m.ContractsComponent )
+            },
           ]
       },
       {

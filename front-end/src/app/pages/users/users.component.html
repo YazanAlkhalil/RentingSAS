@@ -1,6 +1,6 @@
 <div class="card">
     
-    <p-table #dt [value]="users" [rows]="10" [paginator]="true"
+    <p-table #dt [value]="users" [rows]="10"
     [globalFilterFields]="['attributes.username','attributes.contactInfo.email', 'attributes.contactInfo.phone']"
         [rowsPerPageOptions]="[10, 25, 50, 100]"
         [rowHover]="true" dataKey="id"

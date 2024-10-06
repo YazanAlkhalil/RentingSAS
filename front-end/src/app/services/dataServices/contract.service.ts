@@ -14,12 +14,13 @@ import { Building } from "../../models/Building";
 export class ContractService {
   constructor( private authService: AuthService ) {}
 
-  addContract(contract:Contract , apartment:{apartment:Apartment , buildingId:string , buildingName:string}): Promise<Contract> {
+  addContract(contract:Contract , apartment:{apartment:Apartment , buildingId:string , buildingName:string},paymentFrequency:string): Promise<Contract> {
     contract.set('company_id',this.authService.getCurrentUser()?.get('company_id'))
     const building_id = new Building()
     building_id.id = apartment.buildingId
     contract.set('building_id' , building_id)
     contract.apartment_id = apartment.apartment._id
+    contract.set('paymentFrequency' , paymentFrequency)
     return contract.save();
   }
 

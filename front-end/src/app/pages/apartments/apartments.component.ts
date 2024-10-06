@@ -86,7 +86,7 @@ export class ApartmentsComponent {
   };
   buildings!: Building[];
   dropdownBuildings: { name: string; id: string }[] = [];
-  selectedBuilding!:{ name: string; id: string };
+  selectedBuilding!: { name: string; id: string };
   apartment!: Apartment;
   submitted: boolean = false;
   selectedPaymentFrequency!: string;
@@ -107,7 +107,13 @@ export class ApartmentsComponent {
     { name: 'Internet', value: 'Internet' },
   ];
   selectedAmenities: string[] = [];
-
+  maintenanceExpenseDialog: boolean = false
+  maintenanceExpense: Expenses = new Expenses()
+  apartmentStateOptions = [
+    { name: 'Available', value: 'available' },
+    { name: 'Under Maintenance', value: 'underMaintenance' },
+  ];
+  selectedApartmentState: string = '';
   data: {
     skip: number;
     limit: number;
@@ -116,13 +122,13 @@ export class ApartmentsComponent {
     withCount: boolean;
     company_id: Parse.Pointer;
   } = {
-    skip: 0,
-    limit: 5,
-    searchValue: "",
-    sortField: "name",
-    withCount: false,
-    company_id: this.authService.getCurrentUser()?.get("company_id"),
-  };
+      skip: 0,
+      limit: 5,
+      searchValue: "",
+      sortField: "name",
+      withCount: false,
+      company_id: this.authService.getCurrentUser()?.get("company_id"),
+    };
 
   contract: Contract = new Contract();
   contractDialog = false;
@@ -146,22 +152,22 @@ export class ApartmentsComponent {
     private buildingService: BuildingService,
     private confirmationService: ConfirmationService,
     private contractService: ContractService
-  ) {}
+  ) { }
   ngOnInit() {
     this.getApartments()
   }
 
-  getApartments(){
+  getApartments() {
     this.buildingService.getBuildings(this.data).then((data) => {
       this.buildings = data;
       this.apartments = [];
-      this.dropdownBuildings = [] 
+      this.dropdownBuildings = []
       data.forEach((building) => {
         this.dropdownBuildings.push({
           name: building.get("name"),
           id: building.id,
         });
-      });      
+      });
       data.forEach((building) =>
         building.apartment.forEach((apartment) => {
           this.apartments.push({
@@ -179,7 +185,7 @@ export class ApartmentsComponent {
     this.apartmentDialog = true;
     this.apartment = {
       _id: "",
-      name:"",
+      name: "",
       number: "",
       floor: 0,
       size: "",
@@ -198,21 +204,44 @@ export class ApartmentsComponent {
 
   deleteSelectedApartments() { }
 
-  moreDetails(apartment:{apartment:Apartment}){
+
+  openMaintenanceExpenseDialog(){
+    this.maintenanceExpense = new Expenses()
+    this.maintenanceExpense.type = 'Maintenance'
+    this.maintenanceExpenseDialog = true
+  }
+
+  hideMaintenanceExpenseDialog(){
+    this.maintenanceExpenseDialog = false
+  }
+
+  saveMaintenanceExpense(){
+    this.maintenanceExpense.save().then(() => {
+      this.maintenanceExpenseDialog = false
+    }).catch((err:any) => {
+      this.msg.add({
+        severity: "error",
+        summary: "Error",
+        detail: err.message,
+        life: 3000,
+      });
+    })
+  }
+  moreDetails(apartment: { apartment: Apartment }) {
     console.log(apartment);
-    
+
     this.apartment = apartment.apartment
     this.moreDetailsDialog = true
   }
- 
+
   hideDialog() {
     console.log(this.apartment);
     console.log(this.buildings);
-    
-    const buildingIndex = this.buildings.findIndex(building => building.apartment.some(apartment => apartment._id ==this.apartment._id))
-    console.log(buildingIndex,'s');
-    
-    if(buildingIndex !== -1){
+
+    const buildingIndex = this.buildings.findIndex(building => building.apartment.some(apartment => apartment._id == this.apartment._id))
+    console.log(buildingIndex, 's');
+
+    if (buildingIndex !== -1) {
       this.buildings[buildingIndex].revert()
     }
     this.getApartments()
@@ -224,64 +253,45 @@ export class ApartmentsComponent {
   async saveApartment() {
 
     this.submitted = true;
-    
+
     if (
       this.apartment.number &&
       this.apartment.floor &&
       this.apartment.bathroom &&
       this.apartment.bedroom
     ) {
-      if(this.apartment._id !==''){
-        console.log(this.apartment,'s');
-        
+      if (this.apartment._id !== '') {
+        console.log(this.apartment, 's');
+
         this.buildings.find(building => {
-          const apartment = building.apartment.findIndex(apartment => apartment._id ==this.apartment._id)
-          if(apartment !== -1){
+          const apartment = building.apartment.findIndex(apartment => apartment._id == this.apartment._id)
+          if (apartment !== -1) {
             this.apartment.amenities = this.selectedAmenities;
             building.apartment[apartment] = this.apartment
-            building.save().then(()=>{
+            building.save().then(() => {
               this.apartmentDialog = false;
               this.getApartments()
             }
-              
+
             )
             return true
           }
           return false
         })
 
-      return
+        return
       }
       const buildingIndex = this.buildings.findIndex(
         (building) => this.selectedBuilding.id === building.id
       );
       console.log(buildingIndex);
-      
+
       if (buildingIndex !== -1) {
         this.apartment._id = this.createId()
         this.apartment.amenities = this.selectedAmenities;
         this.buildings[buildingIndex].apartment.push(this.apartment);
         await this.buildings[buildingIndex].save()
-        
-        // Get the building name
-        const buildingName = this.buildings[buildingIndex].get('name');
-        
-        // Get the company name
-        const companyName = this.authService.getCurrentUser()?.get('company_id').get('name');
-        
-        // Get the username
-        const username = this.authService.getCurrentUser()?.get('username');
-        
-        const report = new Parse.Object('Report')
-        report.set('apartment_name', this.apartment.name)
-        report.set('building_name', buildingName) 
-        report.set('company_name', companyName)   
-        report.set('username', username) 
-        report.set('type','new_apartment')
-        console.log(report,'report');
-        
-        await report.save()
-        
+
         this.msg.add({
           severity: "success",
           summary: "Successful",
@@ -294,19 +304,21 @@ export class ApartmentsComponent {
       }
     }
   }
-  editApartment(apartment: {apartment:Apartment,buildingName:string,buildingId:string}) {
-    this.selectedBuilding = {name:apartment.buildingName,id:apartment.buildingId}
+  editApartment(apartment: { apartment: Apartment, buildingName: string, buildingId: string }) {
+    this.selectedBuilding = { name: apartment.buildingName, id: apartment.buildingId }
     this.apartment = apartment.apartment;
     console.log(this.apartment, "app");
     this.apartmentDialog = true;
     this.selectedAmenities = apartment.apartment.amenities;
   }
 
-  deleteApartment(selectedApartment: {apartment:Apartment,buildingId:string}) {
+  deleteApartment(selectedApartment: { apartment: Apartment, buildingId: string }) {
     this.confirmationService.confirm({
       message: "Are you sure you want to delete this apartment ?",
       header: "Confirm",
       icon: "pi pi-exclamation-triangle",
+      rejectButtonStyleClass: 'p-button-secondary p-button-text',
+      acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         const building = this.buildings.find(
           (building) => building.id === selectedApartment.buildingId);
@@ -314,12 +326,12 @@ export class ApartmentsComponent {
           const apartmentIndex = building.apartment.findIndex(
             (apartment) => apartment._id === selectedApartment.apartment._id
           );
-          console.log(building,'s');
-          console.log(apartmentIndex,'s');
-          
+          console.log(building, 's');
+          console.log(apartmentIndex, 's');
+
           if (apartmentIndex !== -1) {
             building.apartment.splice(apartmentIndex, 1);
-            building.save().then(()=>{
+            building.save().then(() => {
               this.msg.add({
                 severity: "success",
                 summary: "Successful",
@@ -343,8 +355,8 @@ export class ApartmentsComponent {
   }
 
   deleteImage(index: number) {
-    
-        this.apartment.img.splice(index, 1); 
+
+    this.apartment.img.splice(index, 1);
   }
 
   createId(): string {
@@ -370,18 +382,20 @@ export class ApartmentsComponent {
     buildingName: string;
   }) {
     const contractQuery = new Parse.Query(Contract)
-    contractQuery.equalTo('apartment_id',apartment.apartment._id)
-    contractQuery.first().then((contract :Contract | undefined)=>{
-      if(contract){
+    contractQuery.equalTo('apartment_id', apartment.apartment._id)
+    contractQuery.first().then((contract: Contract | undefined) => {
+      if (contract) {
         this.contract = contract
+        this.selectedPaymentFrequency = contract.get('paymentFrequency')
         this.isContract = true
         this.contractDialog = true;
         this.cd.detectChanges()
-        
+
       }
-      else{
+      else {
         this.contractDialog = true;
         this.contract = new Contract();
+        this.selectedPaymentFrequency = ''
         this.isContract = false
         this.cd.detectChanges()
       }
@@ -391,7 +405,7 @@ export class ApartmentsComponent {
     this.cd.detectChanges()
   }
   saveContract() {
-    this.submitted = true; 
+    this.submitted = true;
     if (
       this.contract.get("startDate") &&
       this.contract.get("endDate") &&
@@ -400,9 +414,10 @@ export class ApartmentsComponent {
       this.contract.get("client").name &&
       this.contract.get("client").contactInfo.email &&
       this.contract.get("client").contactInfo.phone
-    ) {   
-      if(this.contract.id){
-         this.contract.save().then(()=>{
+    ) {
+      if (this.contract.id) {
+        this.contract.set('paymentFrequency', this.selectedPaymentFrequency)
+        this.contract.save().then(() => {
           this.contractDialog = false;
           this.msg.add({
             severity: "success",
@@ -411,11 +426,11 @@ export class ApartmentsComponent {
             life: 3000,
           });
           this.cd.detectChanges()
-         })
-         return 
+        })
+        return
       }
-      this.contractService.addContract(this.contract, this.selectedApartment);
-      console.log(this.contract, "contract");
+
+      this.contractService.addContract(this.contract, this.selectedApartment, this.selectedPaymentFrequency);
       this.msg.add({
         severity: "success",
         summary: "Successful",
@@ -437,8 +452,10 @@ export class ApartmentsComponent {
       message: "Are you sure you want to delete this contract ?",
       header: "Confirm",
       icon: "pi pi-exclamation-triangle",
+      rejectButtonStyleClass: 'p-button-secondary p-button-text',
+      acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.contractService.deleteContract(this.contract).then(()=>{
+        this.contractService.deleteContract(this.contract).then(() => {
           this.contractDialog = false;
           this.msg.add({
             severity: "success",
@@ -458,18 +475,14 @@ export class ApartmentsComponent {
     this.imagesDialog = true;
   }
   contractInfos() {
-    if (
+    return (
       this.contract.get("startDate") &&
-    this.contract.get("endDate") &&
-    this.contract.get("rentAmount") &&
-    this.selectedPaymentFrequency &&
-    this.contract.get("client").name &&
-    this.contract.get("client").contactInfo.email &&
-    this.contract.get("client").contactInfo.phone
-    ) {
-      return true;
-    } else {
-      return false;
-    }
+      this.contract.get("endDate") &&
+      this.contract.get("rentAmount") &&
+      this.selectedPaymentFrequency &&
+      this.contract.get("client").name &&
+      this.contract.get("client").contactInfo.email &&
+      this.contract.get("client").contactInfo.phone
+    )
   }
 }
