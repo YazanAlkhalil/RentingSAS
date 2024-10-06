@@ -14,7 +14,7 @@ Parse.Cloud.define("deleteCompany", async (req: Parse.Cloud.FunctionRequest) => 
 
     // Delete related buildings and their contracts
     const buildingQuery = new Parse.Query(Building);
-    buildingQuery.equalTo('company_id', company);
+    buildingQuery.equalTo('company', company);
     const buildings = await buildingQuery.find({useMasterKey: true});
     const apartmentQuery = new Parse.Query(Apartment)
     apartmentQuery.containedIn('building' , buildings)

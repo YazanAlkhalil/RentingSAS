@@ -29,14 +29,13 @@ import { InputNumberModule } from "primeng/inputnumber";
 import { DropdownModule } from "primeng/dropdown";
 import { ConfirmationService, MessageService } from "primeng/api";
 import Parse from "parse";
-import { AuthService } from "../../services/other/auth.service";
 import { BuildingService } from "../../services/dataServices/building.service";
 import { Contract } from "../../models/Contract";
 import { MultiSelectModule } from "primeng/multiselect";
 import { ContractService } from "../../services/dataServices/contract.service";
 import { CalendarModule } from "primeng/calendar";
 import { CarouselModule } from "primeng/carousel";
-import { Company } from "../../models/Company";
+import { ApartmentService } from "../../services/dataServices/apartment.service";
 
 @Component({
   selector: "app-apartments",
@@ -74,11 +73,7 @@ import { Company } from "../../models/Company";
 export class ApartmentsComponent {
   selectedApartments!: [];
   apartmentDialog: boolean = false;
-  apartments!: {
-    buildingName: string;
-    buildingId: string;
-    apartment: Apartment;
-  }[];
+  apartments: Apartment[] = [];
   selectedApartment!: {
     buildingName: string;
     buildingId: string;
@@ -114,14 +109,12 @@ export class ApartmentsComponent {
     searchValue: string;
     sortField: string;
     withCount: boolean;
-    
   } = {
     skip: 0,
     limit: 5,
     searchValue: "",
     sortField: "name",
     withCount: false,
-    
   };
 
   contract: Contract = new Contract();
@@ -140,7 +133,7 @@ export class ApartmentsComponent {
   ];
   isContract: boolean = false;
   constructor(
-    private authService: AuthService,
+    private apartmentService: ApartmentService,
     private cd: ChangeDetectorRef,
     private msg: MessageService,
     private buildingService: BuildingService,
@@ -148,36 +141,32 @@ export class ApartmentsComponent {
     private contractService: ContractService
   ) {}
   ngOnInit() {
-    // this.getApartments();
+    this.getApartments();
   }
 
-  // getApartments() {
-  //   this.buildingService.getBuildings(this.data).then((data) => {
-  //     this.buildings = data;
-  //     this.apartments = [];
-  //     this.dropdownBuildings = [];
-  //     data.forEach((building) => {
-  //       this.dropdownBuildings.push({
-  //         name: building.get("name"),
-  //         id: building.id,
-  //       });
-  //     });
-  //     data.forEach((building) =>
-  //       building.apartment.forEach((apartment) => {
-  //         this.apartments.push({
-  //           buildingName: building.name,
-  //           buildingId: building.id,
-  //           apartment: apartment,
-  //         });
-  //       })
-  //     );
-  //     this.apartments = [...this.apartments];
-  //     this.cd.detectChanges();
-  //   });
-  // }
+  getApartments() {
+    this.buildingService.getBuildings(this.data).then((data) => {
+      this.buildings = data;
+      this.dropdownBuildings = [];
+      data.forEach((building) => {
+        this.dropdownBuildings.push({
+          name: building.get("name"),
+          id: building.id,
+        });
+      });
+      console.log(this.dropdownBuildings, "dbs");
+      this.apartmentService.getApartments(this.data).then((data) => {
+        this.apartments = data;
+        console.log(this.apartments,'aps')        
+        this.apartments = [...this.apartments];
+        this.cd.detectChanges();
+      });
+    });
+  }
   openNew() {
     this.apartmentDialog = true;
-    this.apartment = new Apartment()
+    this.apartment = new Apartment();
+    this.apartment.status = 'available'
     this.submitted = false;
     this.selectedAmenities = [];
   }
@@ -192,27 +181,13 @@ export class ApartmentsComponent {
   }
 
   hideDialog() {
-    console.log(this.apartment);
-    console.log(this.buildings);
-
-    // const buildingIndex = this.buildings.findIndex((building) =>
-    //   building.apartment.some(
-    //     (apartment) => apartment._id == this.apartment._id
-    //   )
-    // );
-    // console.log(buildingIndex, "s");
-
-    // if (buildingIndex !== -1) {
-    //   this.buildings[buildingIndex].revert();
-    // }
-    // this.getApartments();
     this.apartmentDialog = false;
     this.submitted = false;
-    this.buildingService.getBuildings(this.data);
+    this.getApartments();
     this.cd.detectChanges();
   }
   async saveApartment() {
-    console.log('apartment saved');
+    console.log("apartment saved");
     this.submitted = true;
     if (
       this.apartment.number &&
@@ -220,8 +195,18 @@ export class ApartmentsComponent {
       this.apartment.bathroom &&
       this.apartment.bedroom
     ) {
-      if (this.apartment.id !== "") {
-        console.log(this.apartment, "s");
+
+      const buildingPointer = new Building()
+      buildingPointer.id = this.selectedBuilding.id
+      this.apartment.building = buildingPointer 
+      this.apartmentService.addApartment(this.apartment).then(() => {
+        this.msg.add({
+          severity: "success",
+          summary: "Successful",
+          detail: "Apartment Added",
+          life: 3000,
+        });
+      });
 
       //   this.buildings.find((building) => {
       //     const apartment = building.apartment.findIndex(
@@ -258,16 +243,9 @@ export class ApartmentsComponent {
       //   this.apartment.amenities = this.selectedAmenities;
       //   this.buildings[buildingIndex].apartment.push(this.apartment);
       //   await this.buildings[buildingIndex].save();
-        this.msg.add({
-          severity: "success",
-          summary: "Successful",
-          detail: "Apartment Added",
-          life: 3000,
-        });
-        this.apartmentDialog = false;
-        // this.getApartments();
-        this.cd.detectChanges();
-      }
+      this.apartmentDialog = false;
+      this.getApartments();
+      this.cd.detectChanges();
     }
   }
   editApartment(apartment: {
@@ -285,39 +263,21 @@ export class ApartmentsComponent {
     this.selectedAmenities = apartment.apartment.amenities;
   }
 
-  deleteApartment(selectedApartment: {
-    apartment: Apartment;
-    buildingId: string;
-  }) {
+  deleteApartment(apartment: Apartment) {
     this.confirmationService.confirm({
       message: "Are you sure you want to delete this apartment ?",
       header: "Confirm",
       icon: "pi pi-exclamation-triangle",
       accept: () => {
-        const building = this.buildings.find(
-          (building) => building.id === selectedApartment.buildingId
-        );
-        // if (building) {
-        //   const apartmentIndex = building.apartment.findIndex(
-        //     (apartment) => apartment._id === selectedApartment.apartment._id
-        //   );
-        //   console.log(building, "s");
-        //   console.log(apartmentIndex, "s");
-
-        //   // if (apartmentIndex !== -1) {
-        //   //   building.apartment.splice(apartmentIndex, 1);
-        //   //   building.save().then(() => {
-        //   //     this.msg.add({
-        //   //       severity: "success",
-        //   //       summary: "Successful",
-        //   //       detail: "Apartment Deleted",
-        //   //       life: 3000,
-        //   //     });
-        //   //     // this.getApartments();
-        //   //     this.cd.detectChanges();
-        //   //   });
-        //   // }
-        // }
+        this.apartmentService.deleteApartment(this.apartment);
+        this.msg.add({
+          severity: "success",
+          summary: "Successful",
+          detail: "Apartment Deleted",
+          life: 3000,
+        });
+        this.getApartments();
+        this.cd.detectChanges();
       },
     });
   }
@@ -331,16 +291,6 @@ export class ApartmentsComponent {
 
   deleteImage(index: number) {
     this.apartment.imgs.splice(index, 1);
-  }
-
-  createId(): string {
-    let id = "";
-    var chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (var i = 0; i < 5; i++) {
-      id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return id;
   }
 
   cancel(): void {

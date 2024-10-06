@@ -79,16 +79,16 @@
         <p-tableCheckbox [value]="apartment" />
       </td>
       <td>
-        {{ apartment.apartment.name }} 
+        {{ apartment.name }} 
       </td>
       <td>
-        {{ apartment.buildingName }} 
+        {{ apartment.building.get('name') }} 
       </td>
       <td>
-        {{ apartment.apartment.floor }}
+        {{ apartment.floor }}
       </td>
       <td>
-        {{apartment.apartment.size}}
+        {{apartment.size}}
       </td>
       <!-- <td>
         <p-image
@@ -103,13 +103,13 @@
         >
         </p-image>
       </td> -->
-      <td> {{apartment.apartment.status}} </td>
+      <td> {{apartment.status}} </td>
       <td>
-        {{apartment.apartment.isFurnished}}
+        {{apartment.isFurnished}}
       </td>
-      <td> {{apartment.apartment.bedroom}} </td>
-      <td> {{apartment.apartment.bathroom}}  </td>
-      <td> {{apartment.apartment.rentPrice ? apartment.apartment.rentPrice +'$' : 'no price' }}  </td>
+      <td> {{apartment.bedroom}} </td>
+      <td> {{apartment.bathroom}}  </td>
+      <td> {{apartment.rentPrice ? apartment.rentPrice +'$' : 'no price' }}  </td>
       <td>
         <p-button
           icon="pi pi-bars"
@@ -136,7 +136,7 @@
           (onClick)="deleteApartment(apartment)"
         />
         <p-button
-        [hidden]="apartment.apartment.status !== 'available'"
+        [hidden]="apartment.status !== 'available'"
         icon="pi pi-plus"
         severity="primary"
         [rounded]="true"
