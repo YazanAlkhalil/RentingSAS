@@ -1,7 +1,6 @@
 import {Company} from "../../models/Company"
 import {Building} from "../../models/Building"
 import {User} from "../../models/_User"
-import {Report} from "../../models/Report"
 import {Contract} from "../../models/Contract"
 import { Apartment } from "../../models/Apartment"
 
@@ -34,11 +33,7 @@ Parse.Cloud.define("deleteCompany", async (req: Parse.Cloud.FunctionRequest) => 
     console.log(users)
     Parse.Object.destroyAll(users,{useMasterKey:true});
 
-    // Delete related reports
-    const reportQuery = new Parse.Query(Report);
-    reportQuery.equalTo('company', company);
-    const reports = await reportQuery.find({useMasterKey: true});
-    Parse.Object.destroyAll(reports,{useMasterKey:true});
+    
 
     // Finally delete the company
     await company.destroy({useMasterKey: true});

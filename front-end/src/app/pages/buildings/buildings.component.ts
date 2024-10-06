@@ -21,6 +21,7 @@ import { AuthService } from "../../services/other/auth.service";
 import { File } from "parse";
 import { ImageModule } from "primeng/image";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
+import { PaginatorModule } from "primeng/paginator";
 
 @Component({
   selector: "app-buildings",
@@ -44,6 +45,7 @@ import { ConfirmDialogModule } from "primeng/confirmdialog";
     FormsModule,
     FileUploadModule,
     ImageModule,
+    PaginatorModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: "./buildings.component.html",
@@ -56,6 +58,8 @@ export class BuildingsComponent {
   buildingsName: any[] = []
   building: Building = new Building();
   submitted: boolean = false;
+  skip: number = 0;
+  limit: number = 10;
   statuses!: any[];
   selectedBuildings!: Building[] | null;
   data: {
@@ -110,11 +114,19 @@ export class BuildingsComponent {
     this.buildingDialog = true;
   }
 
+  onPageChange(event: any) {
+    this.skip = event.first;
+    this.limit = event.rows;
+    this.getBuildings();
+  }
+
   deleteSelectedBuildings() {
     this.confirmationService.confirm({
       message: "Are you sure you want to delete the selected buildings?",
       header: "Confirm",
       icon: "pi pi-exclamation-triangle",
+      rejectButtonStyleClass: 'p-button-secondary p-button-text',
+      acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.buildings = this.buildings.filter(
           (val) => !this.selectedBuildings?.includes(val)
@@ -141,6 +153,8 @@ export class BuildingsComponent {
       message: "Are you sure you want to delete " + building.name + "?",
       header: "Confirm",
       icon: "pi pi-exclamation-triangle",
+      rejectButtonStyleClass: 'p-button-secondary p-button-text',
+      acceptButtonStyleClass: 'p-button-danger',
       accept: async () => {
         try {
           await this.buildingService.deleteBuilding(building);
@@ -189,7 +203,7 @@ export class BuildingsComponent {
           this.buildingService
             .addBuilding(this.building)
             .then((building) => {
-              this.buildings.push(building);
+              this.buildings.unshift(building);
               this.messageService.add({
                 severity: "success",
                 summary: "Successful",

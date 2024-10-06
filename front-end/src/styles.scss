@@ -5,13 +5,13 @@
 @import "primeflex/primeflex.scss";
 
 @font-face {
-  font-family: "Cairo";
-  src: url(./assets/fonts/Cairo/cairo.ttf) format("ttf");
+  font-family: "Roboto";
+  src: url(./assets/fonts/Roboto/Roboto-Regular.ttf) format("ttf");
 }
 
 html,
 body {
-  font-family: cairo !important;
+  font-family: roboto, sans-serif !important;
   margin: 0;
   background-color: var(--surface-b);
   overflow-x: hidden;
@@ -45,7 +45,7 @@ body {
   margin: 1rem;
 }
 * {
-  font-family: cairo;
+  font-family: roboto, sans-serif;
 }
 .p-paginator .p-dropdown .p-dropdown-label {
   font-family:monospace; 

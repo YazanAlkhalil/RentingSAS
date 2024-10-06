@@ -11,9 +11,7 @@ import { Apartment } from "../../models/Apartment";
 import { TranslateModule } from "@ngx-translate/core";
 import { InputTextModule } from "primeng/inputtext";
 import {
-  FormArray,
-  FormControl,
-  FormGroup,
+
   FormsModule,
   ReactiveFormsModule,
 } from "@angular/forms";
@@ -35,6 +33,7 @@ import { MultiSelectModule } from "primeng/multiselect";
 import { ContractService } from "../../services/dataServices/contract.service";
 import { CalendarModule } from "primeng/calendar";
 import { CarouselModule } from "primeng/carousel";
+import { Expenses } from "../../models/Expenses";
 import { ApartmentService } from "../../services/dataServices/apartment.service";
 
 @Component({
@@ -102,7 +101,13 @@ export class ApartmentsComponent {
     { name: "Internet", value: "Internet" },
   ];
   selectedAmenities: string[] = [];
-
+  maintenanceExpenseDialog: boolean = false
+  maintenanceExpense: Expenses = new Expenses()
+  apartmentStateOptions = [
+    { name: 'Available', value: 'available' },
+    { name: 'Under Maintenance', value: 'underMaintenance' },
+  ];
+  selectedApartmentState: string = '';
   data: {
     skip: number;
     limit: number;
@@ -139,7 +144,7 @@ export class ApartmentsComponent {
     private buildingService: BuildingService,
     private confirmationService: ConfirmationService,
     private contractService: ContractService
-  ) {}
+  ) { }
   ngOnInit() {
     this.getApartments();
   }
@@ -173,11 +178,34 @@ export class ApartmentsComponent {
 
   deleteSelectedApartments() {}
 
+
+  openMaintenanceExpenseDialog(){
+    this.maintenanceExpense = new Expenses()
+    this.maintenanceExpense.type = 'Maintenance'
+    this.maintenanceExpenseDialog = true
+  }
+
+  hideMaintenanceExpenseDialog(){
+    this.maintenanceExpenseDialog = false
+  }
+
+  saveMaintenanceExpense(){
+    this.maintenanceExpense.save().then(() => {
+      this.maintenanceExpenseDialog = false
+    }).catch((err:any) => {
+      this.msg.add({
+        severity: "error",
+        summary: "Error",
+        detail: err.message,
+        life: 3000,
+      });
+    })
+  }
   moreDetails(apartment: { apartment: Apartment }) {
     console.log(apartment);
 
-    this.apartment = apartment.apartment;
-    this.moreDetailsDialog = true;
+    this.apartment = apartment.apartment
+    this.moreDetailsDialog = true
   }
 
   hideDialog() {
@@ -189,6 +217,7 @@ export class ApartmentsComponent {
   async saveApartment() {
     console.log("apartment saved");
     this.submitted = true;
+
     if (
       this.apartment.number &&
       this.apartment.floor &&
@@ -268,6 +297,8 @@ export class ApartmentsComponent {
       message: "Are you sure you want to delete this apartment ?",
       header: "Confirm",
       icon: "pi pi-exclamation-triangle",
+      rejectButtonStyleClass: 'p-button-secondary p-button-text',
+      acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.apartmentService.deleteApartment(this.apartment);
         this.msg.add({
@@ -310,14 +341,16 @@ export class ApartmentsComponent {
     contractQuery.first().then((contract: Contract | undefined) => {
       if (contract) {
         this.contract = contract;
+        this.selectedPaymentFrequency = contract.get('paymentFrequency')
         this.isContract = true;
         this.contractDialog = true;
         this.cd.detectChanges();
       } else {
         this.contractDialog = true;
         this.contract = new Contract();
-        this.isContract = false;
-        this.cd.detectChanges();
+        this.selectedPaymentFrequency = ''
+        this.isContract = false
+        this.cd.detectChanges()
       }
     });
     this.submitted = false;
@@ -336,6 +369,7 @@ export class ApartmentsComponent {
       this.contract.get("client").contactInfo.phone
     ) {
       if (this.contract.id) {
+        this.contract.set('paymentFrequency', this.selectedPaymentFrequency)
         this.contract.save().then(() => {
           this.contractDialog = false;
           this.msg.add({
@@ -371,6 +405,8 @@ export class ApartmentsComponent {
       message: "Are you sure you want to delete this contract ?",
       header: "Confirm",
       icon: "pi pi-exclamation-triangle",
+      rejectButtonStyleClass: 'p-button-secondary p-button-text',
+      acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.contractService.deleteContract(this.contract).then(() => {
           this.contractDialog = false;
@@ -392,7 +428,7 @@ export class ApartmentsComponent {
     this.imagesDialog = true;
   }
   contractInfos() {
-    if (
+    return (
       this.contract.get("startDate") &&
       this.contract.get("endDate") &&
       this.contract.get("rentAmount") &&
@@ -400,10 +436,6 @@ export class ApartmentsComponent {
       this.contract.get("client").name &&
       this.contract.get("client").contactInfo.email &&
       this.contract.get("client").contactInfo.phone
-    ) {
-      return true;
-    } else {
-      return false;
-    }
+    )
   }
 }

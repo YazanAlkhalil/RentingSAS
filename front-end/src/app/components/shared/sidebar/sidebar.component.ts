@@ -51,6 +51,18 @@ export class SidebarComponent implements OnInit {
   loading = false;
   menuItems: CustomMenuItem[] = [
     {
+      id:'contracts',
+      title:this.translateService.instant('contracts'),
+      icon:'pi pi-file-pdf',
+      routerLink:'/main/contracts',
+    },
+    {
+      id: "apartments",
+      icon: "pi pi-home",
+      title: this.translateService.instant("apartments"),
+      routerLink: "/main/apartments",
+    },
+    {
       id: "buildings",
       title: this.translateService.instant("buildings"),
       icon: "pi pi-building",
@@ -63,14 +75,14 @@ export class SidebarComponent implements OnInit {
       routerLink: "/main/users",
     },
     {
-      id: "apartments",
-      icon: "pi pi-home",
-      title: this.translateService.instant("apartments"),
-      routerLink: "/main/apartments",
+      id:"clients",
+      icon:'fa-regular fa-handshake fa-xs',
+      title:this.translateService.instant('clients'),
+      routerLink: "/main/clients"
     },
     {
       id:"reports",
-      icon:'pi pi-chart-line',
+      icon:'pi pi-chart-line ',
       title:this.translateService.instant('reports'),
       routerLink: "/main/reports"
     }

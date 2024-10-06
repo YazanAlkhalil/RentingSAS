@@ -4,7 +4,6 @@ import { authGuard } from "./services/guards/auth.guard";
 import { AuthComponent } from "./components/shared/auth/auth.component";
 import { AdminLayoutComponent } from "./components/layouts/admin-layout/admin-layout.component";
 import { adminGuard } from "./services/guards/admin.guard";
-
 export const routes: Routes = [
   {
     path: "",
@@ -74,7 +73,18 @@ export const routes: Routes = [
             //     import('./pages/reports/reports.component')
             //   .then( (m) => m.ReportsComponent )
             // },
-
+            {
+              path:'clients',
+              loadComponent: () => 
+                import('./pages/clients/clients.component')
+              .then( (m) => m.ClientsComponent )
+            },
+            {
+              path:'contracts',
+              loadComponent: () => 
+                import('./pages/contracts/contracts.component')
+              .then( (m) => m.ContractsComponent )
+            },
           ]
       },
       {

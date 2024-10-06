@@ -17,19 +17,20 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { RatingModule } from 'primeng/rating';
 import { FormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { PaginatorModule } from 'primeng/paginator';
 import { Company } from '../../models/Company';
 import { AdminService } from '../../services/dataServices/admin.service';
 import { ImageModule } from 'primeng/image';
 import Parse from 'parse';
 import { ParseError } from '@angular/compiler';
 import { User } from '../../models/_User';
-import { parse } from '@fortawesome/fontawesome-svg-core';
 import { AvatarModule } from 'primeng/avatar';
+import { SortEvent } from 'primeng/api';
 
 @Component({
   selector: 'app-table',
   standalone: true,
-  imports: [TableModule, DialogModule, RippleModule, ButtonModule, ToastModule, ToolbarModule, ConfirmDialogModule, InputTextModule, InputTextareaModule, CommonModule, FileUploadModule, DropdownModule, TagModule, RadioButtonModule, RatingModule, InputTextModule, FormsModule, InputNumberModule, ImageModule, AvatarModule],
+  imports: [TableModule, DialogModule, RippleModule, ButtonModule, ToastModule, ToolbarModule, ConfirmDialogModule, InputTextModule, InputTextareaModule, CommonModule, FileUploadModule, DropdownModule, TagModule, RadioButtonModule, RatingModule, InputTextModule, FormsModule, InputNumberModule, ImageModule, AvatarModule, PaginatorModule],
   providers: [MessageService, ConfirmationService, AdminService],
   templateUrl: './table.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -45,6 +46,12 @@ export class TableComponent implements OnInit {
   selectedCompany!: Company;
   addUserDialog: boolean = false;
   newUser: User = new User();
+  skip: number = 0;
+  limit: number = 10;
+  count: number = 0;
+  searchValue: string = '';
+  sortField: string = '';
+  sortOrder: 'asc' | 'desc' = 'desc';
 
   constructor(
     private messageService: MessageService,
@@ -53,16 +60,43 @@ export class TableComponent implements OnInit {
     private cd: ChangeDetectorRef
   ) {}
 
+  onPageChange(event: any) {
+    this.skip = event.first;
+    this.limit = event.rows;
+    this.getCompanies();
+  }
+
   ngOnInit() {
+    this.getCompanies();
+  }
+
+  onSearchChange() {
+    this.skip = 0; 
+    this.getCompanies();
+  }
+
+  onSort(event: SortEvent) {
+    this.sortField = event.field as string;
+    this.sortOrder = event.order === 1 ? 'asc' : 'desc';
     this.getCompanies();
   }
 
   getCompanies() {
     this.adminService.getCompanies({
-      searchValue: '',
-      withCount: false
-    }).then((data: Company[]) => {
-      this.companies = data;
+      searchValue: this.searchValue,
+      withCount: true,
+      skip: this.skip,
+      limit: this.limit,
+      sortField: this.sortField,
+      sortOrder: this.sortOrder
+    }).then((data: Company[] | { results: Company[]; count: number }) => {
+      if ('results' in data) {
+        this.companies = data.results;
+        this.count = data.count;
+      }
+      else{
+        this.companies = data;
+      }
       console.log(data);
             
       this.cd.detectChanges()
@@ -80,6 +114,8 @@ export class TableComponent implements OnInit {
       message: 'Are you sure you want to delete the selected companies?',
       header: 'Confirm',
       icon: 'pi pi-exclamation-triangle',
+      rejectButtonStyleClass: 'p-button-secondary p-button-text',
+      acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         const deletePromises = this.selectedCompanies.map(company => 
           this.adminService.deleteCompany(company)
@@ -136,6 +172,8 @@ export class TableComponent implements OnInit {
       message: 'Are you sure you want to delete ' + company.name + '?',
       header: 'Confirm',
       icon: 'pi pi-exclamation-triangle',
+      rejectButtonStyleClass: 'p-button-secondary p-button-text',
+      acceptButtonStyleClass: 'p-button-danger',
       accept: async () => {
         try {
           await this.adminService.deleteCompany(company)
@@ -172,7 +210,7 @@ export class TableComponent implements OnInit {
         this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Company Updated', life: 3000 });
       } else {
         try {
-          
+          // Create new company
           await this.adminService.addCompany({
             name: this.company.name,
             address: this.company.address,
@@ -181,14 +219,13 @@ export class TableComponent implements OnInit {
             skip: 0,
             limit: 10
           }).then(company => {
-            this.companies.push(company);
+            this.companies.unshift(company);
             this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Company Created', life: 3000 });
           });
         } catch (error: ParseError | any) {
           console.log(error);
           this.messageService.add({ severity: 'error', summary: 'Error', detail: error.message, life: 3000 });
         }
-        // Create new company
       }
 
       this.companies = [...this.companies];
@@ -274,7 +311,7 @@ export class TableComponent implements OnInit {
     }
     const company = new Company()
     company.id = this.selectedCompany.id
-    this.newUser.set('company_id', company);
+    this.newUser.set('company', company);
     console.log(this.newUser);
     
     this.adminService.addUser(this.newUser)
