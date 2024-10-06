@@ -135,6 +135,14 @@
           [outlined]="true"
           (onClick)="deleteApartment(apartment)"
         />
+        <p-button
+        [hidden]="apartment.apartment.status !== 'available'"
+        icon="pi pi-plus"
+        severity="primary"
+        [rounded]="true"
+        [outlined]="true"
+        (onClick)="addContract(apartment)"
+      />
       </td>
     </tr>
   </ng-template>
@@ -154,7 +162,7 @@
   <div *ngIf="apartment">
     <div class="grid">
       <div class="col-12">
-        <p-carousel *ngIf="apartment.img && apartment.img.length > 0" [value]="apartment.img" [numVisible]="1" [numScroll]="1">
+        <p-carousel *ngIf="apartment.imgs && apartment.imgs.length > 0" [value]="apartment.imgs" [numVisible]="1" [numScroll]="1">
           <ng-template let-img pTemplate="item">
             <img [src]="img.url()" [alt]="apartment.number" style="width: 100%;" />
           </ng-template>
@@ -194,7 +202,7 @@
     [modal]="true"
   >
     <ng-template pTemplate="content">
-      <div *ngIf="apartment.img && apartment.img.length > 0" class="mb-3">
+      <div *ngIf="apartment.imgs && apartment.imgs.length > 0" class="mb-3">
         <p>Current Images:</p>
         <p-button label="View Images" (click)="openImagesDialog()"></p-button>
       </div>
@@ -325,8 +333,8 @@
   </p-dialog>
 
   <p-dialog header="Apartment Images" [(visible)]="imagesDialog" [modal]="true" [style]="{width: '600'}">
-    <div class="grid" *ngIf="apartment && apartment.img">
-      <div *ngFor="let img of apartment.img; let i = index" class="col-4 mb-3">
+    <div class="grid" *ngIf="apartment && apartment.imgs">
+      <div *ngFor="let img of apartment.imgs; let i = index" class="col-4 mb-3">
         <div *ngIf="img.url()" class="relative">
           <img [src]="img.url()" alt="Apartment Image" style="width: 100%; height: auto;">
           <button pButton pRipple type="button" icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text absolute top-0 right-0" (click)="deleteImage(i)"></button>
@@ -469,25 +477,25 @@
           type="text"
           pInputText
           id="c-name"
-          [(ngModel)]="contract.client.name"
+          
           [required]="true"
         />
-        <small class="p-error" *ngIf="submitted && !contract.client.name"
+        <!-- <small class="p-error" *ngIf="submitted && !contract.client.name"
           >Client Name is required.</small
-        >
+        > -->
       </div>
       <div class="field p-fluid">
         <label for="c-phone"> Client phone </label>
         <p-inputNumber
           id="c-phone"
-          [(ngModel)]="contract.client.contactInfo.phone"
+         
           [required]="true"
         />
-        <small
+        <!-- <small
           class="p-error"
           *ngIf="submitted && !contract.client.contactInfo.phone"
           >Client Phone is required.</small
-        >
+        > -->
       </div>
       <div class="field p-fluid">
         <label for="c-email"> Client email </label>
@@ -495,14 +503,14 @@
           type="email"
           pInputText
           id="c-email"
-          [(ngModel)]="contract.client.contactInfo.email"
+         
           [required]="true"
         />
-        <small
+        <!-- <small
           class="p-error"
           *ngIf="submitted && !contract.client.contactInfo.email"
           >Client Email is required.</small
-        >
+        > -->
       </div>
       <div class="field p-fluid">
         <label for="infos"> Additional Infos </label>

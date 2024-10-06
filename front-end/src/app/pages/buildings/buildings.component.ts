@@ -64,14 +64,12 @@ export class BuildingsComponent {
     searchValue: string;
     sortField: string;
     withCount: boolean;
-    company_id: Parse.Pointer;
   } = {
     skip: 0,
     limit: 5,
     searchValue: "",
     sortField: "name",
     withCount: false,
-    company_id: this.authService.getCurrentUser()?.get("company_id"),
   };
   constructor(
     private buildingService: BuildingService,
@@ -103,8 +101,11 @@ export class BuildingsComponent {
 
   openNew() {
     this.building = new Building();
-    console.log(this.building,'bb');
+    console.log(this.building , 'll');
     
+    this.building.location.longitude = ''
+    this.building.location.latitude = ''
+    console.log(this.building,'bb');
     this.submitted = false;
     this.buildingDialog = true;
   }
@@ -138,7 +139,7 @@ export class BuildingsComponent {
   deleteBuilding(building: Building) {
     this.confirmationService.confirm({
       message: "Are you sure you want to delete " + building.name + "?",
-      header: "Confirm 2",
+      header: "Confirm",
       icon: "pi pi-exclamation-triangle",
       accept: async () => {
         try {
@@ -171,6 +172,8 @@ export class BuildingsComponent {
     this.cd.detectChanges()
   }
   async saveBuilding() {
+    console.log(this.building,'bl');
+    
     this.submitted = true;
     if (this.building.name?.trim()) {
       if (this.building.id) {

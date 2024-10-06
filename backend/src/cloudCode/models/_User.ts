@@ -1,3 +1,4 @@
+import { Company } from "./Company";
 import { ContactInfo } from "./Interfaces/ContactInfo";
 
 export class User extends Parse.User {
@@ -5,12 +6,12 @@ export class User extends Parse.User {
     super({ className: 'User' });
   }
 
-  get company_id(): Parse.Pointer {
-    return this.get('company_id');
+  get company(): Company {
+    return this.get('company');
   }
 
-  set company_id(value: Parse.Pointer) {
-    this.set('company_id', value);
+  set company(value: Company) {
+    this.set('company', value);
   }
 
   get username(): string {
