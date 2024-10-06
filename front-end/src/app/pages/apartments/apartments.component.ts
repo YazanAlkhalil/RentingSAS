@@ -37,6 +37,7 @@ import { ContractService } from "../../services/dataServices/contract.service";
 import { CalendarModule } from "primeng/calendar";
 import { CarouselModule } from "primeng/carousel";
 import { Company } from "../../models/Company";
+import { Expenses } from "../../models/Expenses";
 
 @Component({
   selector: "app-apartments",

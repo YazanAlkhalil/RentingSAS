@@ -1,4 +1,5 @@
 import {Apartment} from './Apartment';
+import Parse from "parse";
 
 export class Expenses extends Parse.Object {
   constructor() {
