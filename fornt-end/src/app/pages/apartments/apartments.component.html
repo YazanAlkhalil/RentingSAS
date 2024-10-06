@@ -1,0 +1,551 @@
+<div class="card p-1">
+  <p-toast />
+  <p-toolbar styleClass="mb-4 gap-2">
+    <ng-template pTemplate="left">
+      <p-button
+        severity="success"
+        label="New"
+        icon="pi pi-plus"
+        class="mr-2"
+        (onClick)="openNew()"
+      />
+      <p-button
+        severity="danger"
+        label="Delete"
+        icon="pi pi-trash"
+        (onClick)="deleteSelectedApartments()"
+        [disabled]="!selectedApartments || !selectedApartments.length"
+      />
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+  #dt
+  [value]="apartments"
+  [rows]="10"
+  [paginator]="true"
+  [globalFilterFields]="[
+    'buildingName',
+    'buildingId',
+    'apartment.floor',
+    'apartment.size',
+    'apartment.isFurnished',
+    'apartment.status',
+    'apartment.bedroom',
+    'apartment.bathroom',
+    'apartment.rentPrice',
+  ]"
+  [tableStyle]="{ 'min-width': '75rem' }"
+  [(selection)]="selectedApartments"
+  [rowHover]="true"
+  dataKey="apartment._id"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+  [showCurrentPageReport]="true"
+>
+  <ng-template pTemplate="caption">
+    <div class="flex align-items-center justify-content-between">
+      <h5 class="m-0 text-3xl">Manage Apartments</h5>
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          type="text"
+          (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+          placeholder="Search..."
+        />
+      </span>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="header">
+    <tr>
+      <th>
+        <p-tableHeaderCheckbox />
+      </th>
+      <th pSortableColumn="apartment.name" class="text-2xl">Name <p-sortIcon field="name"/></th>
+      <th pSortableColumn="buildingName" class="text-2xl">Building Name <p-sortIcon field="buildingName"/></th>
+      <th pSortableColumn="apartment.floor" class="text-2xl"> Floor <p-sortIcon field="apartment.floor"/></th>
+      <th pSortableColumn="apartment.size" class="text-2xl">Size<p-sortIcon field="apartment.size"/></th>
+      <th pSortableColumn="apartment.status" class="text-2xl">Status<p-sortIcon field="apartment.status"/></th>
+      <th pSortableColumn="apartment.isFurnished" class="text-2xl">Furnished<p-sortIcon field="apartment.isFurnished"/></th>
+      <th pSortableColumn="apartment.bedroom" class="text-2xl">Bedroom<p-sortIcon field="apartment.bedroom"/></th>
+      <th pSortableColumn="apartment.bathroom" class="text-2xl">Bathroom<p-sortIcon field="apartment.bathroom"/></th>
+      <th pSortableColumn="apartment.rentPrice" class="text-2xl">Rent Price<p-sortIcon field="apartment.rentPrice"/></th>
+      <th class="text-2xl">Processes</th>
+    </tr> </ng-template
+  >0.0
+  <ng-template pTemplate="body" let-apartment>
+    <tr class="text-2xl">
+      <td>
+        <p-tableCheckbox [value]="apartment" />
+      </td>
+      <td>
+        {{ apartment.apartment.name }} 
+      </td>
+      <td>
+        {{ apartment.buildingName }} 
+      </td>
+      <td>
+        {{ apartment.apartment.floor }}
+      </td>
+      <td>
+        {{apartment.apartment.size}}
+      </td>
+      <!-- <td>
+        <p-image
+          [src]="
+            apartment.img
+              ? apartment.img.url()
+              : './../../assets/images/default-corporate-image.jpg'
+          "
+          [alt]="apartment.name"
+          width="80"
+          [preview]="true"
+        >
+        </p-image>
+      </td> -->
+      <td> {{apartment.apartment.status}} </td>
+      <td>
+        {{apartment.apartment.isFurnished}}
+      </td>
+      <td> {{apartment.apartment.bedroom}} </td>
+      <td> {{apartment.apartment.bathroom}}  </td>
+      <td> {{apartment.apartment.rentPrice ? apartment.apartment.rentPrice +'$' : 'no price' }}  </td>
+      <td>
+        <p-button
+          icon="pi pi-bars"
+          class="mr-2"
+          [rounded]="true"
+          [outlined]="true"
+          severity="help"
+          (onClick)="moreDetails(apartment)"
+        />
+        <p-button
+          icon="pi pi-pencil"
+          class="mr-2"
+          [rounded]="true"
+          [outlined]="true"
+          severity="success"
+          (onClick)="editApartment(apartment)"
+        />
+        <p-button
+          icon="pi pi-trash"
+          class="mr-2"
+          severity="danger"
+          [rounded]="true"
+          [outlined]="true"
+          (onClick)="deleteApartment(apartment)"
+        />
+        <p-button
+        [hidden]="apartment.apartment.status !== 'available'"
+        icon="pi pi-plus"
+        severity="primary"
+        [rounded]="true"
+        [outlined]="true"
+        (onClick)="addContract(apartment)"
+      />
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="summary">
+    <div class="flex align-items-center justify-content-between">
+      In total there are {{ apartments ? apartments.length : 0 }} apartments.
+    </div>
+  </ng-template>
+</p-table>
+<p-dialog
+    [(visible)]="moreDetailsDialog"
+    [style]="{ width: '800px' }"
+    header="Apartment Details"
+    [modal]="true"
+  >
+  <div *ngIf="apartment">
+    <div class="grid">
+      <div class="col-12">
+        <p-carousel *ngIf="apartment.imgs && apartment.imgs.length > 0" [value]="apartment.imgs" [numVisible]="1" [numScroll]="1">
+          <ng-template let-img pTemplate="item">
+            <img [src]="img.url()" [alt]="apartment.number" style="width: 100%;" />
+          </ng-template>
+        </p-carousel>
+      </div>
+      <div class="col-12">
+        <h2>{{apartment.name}}</h2>
+        <div class="grid text-2xl">
+          <div class="col-6">
+            <p><strong>Floor:</strong> {{ apartment.floor }}</p>
+            <p><strong>Size:</strong> {{ apartment.size }}</p>
+            <p><strong>Bedrooms:</strong> {{ apartment.bedroom }}</p>
+            <p><strong>Bathrooms:</strong> {{ apartment.bathroom }}</p>
+          </div>
+          <div class="col-6">
+            <p><strong>Furnished:</strong> {{ apartment.isFurnished ? 'Yes' : 'No' }}</p>
+            <p><strong>Status:</strong> {{ apartment.status }}</p>
+            <p><strong>Rent Price:</strong> {{ apartment.rentPrice | currency:'USD' }}</p>
+            <p><strong>Apartment Number:</strong> {{ apartment.number }}</p>
+          </div>
+          <div class="col-6">
+            <p><strong>Amenities:</strong></p>
+            <ul>
+              <li *ngFor="let amenity of apartment.amenities">{{ $any(amenity).name }}</li>
+            </ul>
+            <p><strong>Description:</strong> {{ apartment.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+<p-dialog
+    [(visible)]="apartmentDialog"
+    [style]="{ width: '450px' }"
+    header="Apartment Details"
+    [modal]="true"
+  >
+    <ng-template pTemplate="content">
+      <div *ngIf="apartment.imgs && apartment.imgs.length > 0" class="mb-3">
+        <p>Current Images:</p>
+        <p-button label="View Images" (click)="openImagesDialog()"></p-button>
+      </div>
+      <div class="field p-nogutter">
+        <label for="image">Images</label>
+        <div class="p-fileupload-wrapper" style="width: 100%">
+          <p-fileUpload
+            [multiple]="true"
+            name="image"
+            accept="image/*"
+            [maxFileSize]="1000000"
+            (onSelect)="onImageUpload($event)"
+            [auto]="false"
+            chooseLabel="Select Image"
+          >
+          </p-fileUpload>
+        </div>
+        
+      </div>
+      <div class="field  p-fluid">
+        <label for="name">Name</label>
+        <input id="name" type="text" pInputText [(ngModel)]="apartment.name" />
+        <small class="p-error" *ngIf="submitted && !apartment.name">
+          Name is required.
+        </small>
+      </div>
+      <div class="field  p-fluid">
+        <p-dropdown
+          [(ngModel)]="selectedBuilding"
+          [options]="dropdownBuildings"
+          [optionLabel]="'name'"
+          [required]="true"
+          placeholder="Select a Building for this Apartment"
+        >
+        </p-dropdown>
+        <small class="p-error" *ngIf="submitted && !selectedBuilding"
+          >Building is required.</small
+        >
+      </div>
+      <div class="field  p-fluid">
+        <label for="number">Number</label>
+        <p-inputNumber id="number" [(ngModel)]="apartment.number" />
+        <small class="p-error" *ngIf="submitted && !apartment.number">
+          Number is required.
+        </small>
+      </div>
+      <div class="field  p-fluid">
+        <label for=" floor ">Floor</label>
+        <p-inputNumber id="floor" [(ngModel)]="apartment.floor" />
+        <small class="p-error" *ngIf="submitted && !apartment.floor"
+          >Floor is required.</small
+        >
+      </div>
+      <div class="field  p-fluid">
+        <label for="size">Size</label>
+        <p-inputNumber 
+        id="size" 
+        [(ngModel)]="apartment.size"  
+        />
+        <small class="p-error" *ngIf="submitted && !apartment.size">Size is required.</small>
+        </div>
+      <div class="field  p-fluid">
+        <label for="bedroom"> Bedroom </label>
+        <p-inputNumber id="bedroom" [(ngModel)]="apartment.bedroom" />
+        <small class="p-error" *ngIf="submitted && !apartment.bedroom"
+          >Bedroom is required.</small
+        >
+      </div>
+      <div class="field  p-fluid">
+        <label for="bathromm"> Bathroom </label>
+        <p-inputNumber id="bathroom" [(ngModel)]="apartment.bathroom" />
+        <small class="p-error" *ngIf="submitted && !apartment.bathroom"
+          >Bathroom is required.</small
+        >
+      </div>
+      <div class="field  p-fluid">
+        <label for="description"> Description </label>
+        <textarea
+          pInputTextarea
+          [(ngModel)]="apartment.description"
+          required
+          rows="3"
+          cols="20"
+          id="description"
+        >
+        </textarea>
+      </div>
+      <div class="field  p-fluid">
+        <label for="price"> Rent Price </label>
+        <p-inputNumber id="price" [(ngModel)]="apartment.rentPrice" />
+      </div>
+      <div class="field p-fluid">
+        <label for="amenities">Amenities</label>
+        <p-multiSelect 
+          [options]="amenitiesOptions" 
+          [(ngModel)]="selectedAmenities"
+          optionLabel="name"
+          [style]="{'width':'100%'}"
+          [filter]="false"
+          placeholder="Select amenities"
+        ></p-multiSelect>
+      </div>
+      <div class="field  p-fluid">
+        <p-checkbox
+          label="Furnished"
+          name="furnished"
+          [(ngModel)]="apartment.isFurnished"
+          value="true"
+        />
+      </div>
+      
+      
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancel"
+        icon="pi pi-times"
+        [text]="true"
+        (onClick)="hideDialog()"
+      />
+      <p-button
+        label="Save"
+        icon="pi pi-check"
+        [text]="true"
+        (onClick)="saveApartment()"
+      />
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog header="Apartment Images" [(visible)]="imagesDialog" [modal]="true" [style]="{width: '600'}">
+    <div class="grid" *ngIf="apartment && apartment.imgs">
+      <div *ngFor="let img of apartment.imgs; let i = index" class="col-4 mb-3">
+        <div *ngIf="img.url()" class="relative">
+          <img [src]="img.url()" alt="Apartment Image" style="width: 100%; height: auto;">
+          <button pButton pRipple type="button" icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text absolute top-0 right-0" (click)="deleteImage(i)"></button>
+        </div>
+      </div>
+    </div>
+  </p-dialog>
+
+  <p-dialog
+    [(visible)]="contractDialog"
+    [style]="{ width: '450px' }"
+    header="Contract Details"
+    [modal]="true"
+  >
+  <div class="my-4">
+    <p-button
+    [hidden]="!isContract"
+    severity="danger"
+    label="Delete Contract"
+    icon="pi pi-trash"
+    [disabled]="!contractInfos()"
+    (onClick)="deleteContract()"
+  />
+  <p-button
+    [hidden]="isContract"
+    label="Add Contract"
+    icon="pi pi-plus"
+    (onClick)="formVisible()"
+  />
+</div>
+    <ng-template pTemplate="content">
+      <div [hidden]="!isContract">
+      <div class="field p-fluid mt-2">
+        <label for="s-date">Start Date</label>
+        <p-calendar
+          id="s-date"
+          [(ngModel)]="contract.startDate"
+          [required]="true"
+        />
+        <small class="p-error" *ngIf="submitted && !contract.startDate">
+          Start Date is required.
+        </small>
+      </div>
+      <div class="field p-fluid">
+        <label for="e-date">End Date</label>
+        <p-calendar
+          id="e-date"
+          [(ngModel)]="contract.endDate"
+          [required]="true"
+        />
+        <small class="p-error" *ngIf="submitted && !contract.endDate">
+          End Date is required.
+        </small>
+      </div>
+      <div class="field p-fluid">
+        <label for="rent">Rent Amount</label>
+        <p-inputNumber
+          id="rent"
+          [(ngModel)]="contract.rentAmount"
+          [required]="true"
+        />
+        <small class="p-error" *ngIf="submitted && !contract.rentAmount"
+          >Rent Amount is required.</small
+        >
+      </div>
+      <div class="field p-fluid">
+        <p-dropdown
+          [(ngModel)]="selectedPaymentFrequency"
+          [options]="paymentFrequencyOptions"
+          [optionLabel]="'name'"
+          [required]="true"
+          placeholder="Select a payment method"
+        >
+        </p-dropdown>
+        <small class="p-error" *ngIf="submitted && !selectedPaymentFrequency"
+          >Payment Frequency is required.</small
+        >
+      </div>
+      <div class="field p-fluid">
+        <label for="deposit"> Deposit </label>
+        <p-inputNumber
+          id="deposit"
+          [(ngModel)]="contract.deposit"
+          [required]="true"
+        />
+        
+      </div>
+      <div class="field p-fluid">
+        <label for="m-terms"> Maintenance Terms </label>
+        <textarea
+          pInputTextarea
+          [(ngModel)]="contract.maintenanceTerms"
+          required
+          rows="3"
+          cols="20"
+          id="m-terms"
+        >
+        </textarea>
+      </div>
+      <div class="field p-fluid">
+        <label for="s-terms"> Special Terms </label>
+        <textarea
+          pInputTextarea
+          [(ngModel)]="contract.specialTerms"
+          required
+          rows="3"
+          cols="20"
+          id="s-terms"
+        >
+        </textarea>
+      </div>
+      <div class="field p-fluid">
+        <p-multiSelect
+          [(ngModel)]="contract.utilitiesToPay"
+          [options]="utilitiesToPayOptions"
+          [optionLabel]="'name'"
+          [required]="false"
+          placeholder="Select utilities To Pay"
+        >
+        </p-multiSelect>
+      </div>
+      <div class="field p-nogutter">
+        <label for="image">Client Image</label>
+        <div class="p-fileupload-wrapper" style="width: 100%">
+          <p-fileUpload
+            [multiple]="false"
+            name="image"
+            accept="image/*"
+            [maxFileSize]="1000000"
+            (onSelect)="onImageUpload($event)"
+            [auto]="false"
+            chooseLabel="Select Image"
+          >
+          </p-fileUpload>
+        </div>
+      </div>
+      <div class="field p-fluid">
+        <label for="c-name"> Client Name </label>
+        <input
+          type="text"
+          pInputText
+          id="c-name"
+          
+          [required]="true"
+        />
+        <!-- <small class="p-error" *ngIf="submitted && !contract.client.name"
+          >Client Name is required.</small
+        > -->
+      </div>
+      <div class="field p-fluid">
+        <label for="c-phone"> Client phone </label>
+        <p-inputNumber
+          id="c-phone"
+         
+          [required]="true"
+        />
+        <!-- <small
+          class="p-error"
+          *ngIf="submitted && !contract.client.contactInfo.phone"
+          >Client Phone is required.</small
+        > -->
+      </div>
+      <div class="field p-fluid">
+        <label for="c-email"> Client email </label>
+        <input
+          type="email"
+          pInputText
+          id="c-email"
+         
+          [required]="true"
+        />
+        <!-- <small
+          class="p-error"
+          *ngIf="submitted && !contract.client.contactInfo.email"
+          >Client Email is required.</small
+        > -->
+      </div>
+      <div class="field p-fluid">
+        <label for="infos"> Additional Infos </label>
+        <textarea
+          pInputTextarea
+          [(ngModel)]="contract.additionalInfo"
+          rows="3"
+          cols="20"
+          id="infos"
+        >
+        </textarea>
+      </div>
+    </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <div [hidden]="!isContract">
+      <p-button
+        label="Cancel"
+        icon="pi pi-times"
+        [text]="true"
+        (onClick)="cancel()"
+      />
+      <p-button
+        label="Save"
+        icon="pi pi-check"
+        [text]="true"
+        (onClick)="saveContract()"
+      />
+    </div>
+    </ng-template>
+    
+  </p-dialog>
+  <p-confirmDialog [style]="{ width: '450px' }" />
+</div>
+
+
+  
+

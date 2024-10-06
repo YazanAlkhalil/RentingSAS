@@ -1,8 +1,10 @@
 import { Company } from "./Company";
 import { Location } from "./Interfaces/Location";
+import Parse from "parse";
 export class Building extends Parse.Object {
   constructor() {
     super('Building');
+    this.set('location' , {longitude:'' , latitude:''})
   }
 
   get company(): Company {

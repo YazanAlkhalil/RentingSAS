@@ -1,9 +1,11 @@
 import { Company } from "./Company";
 import { ContactInfo } from "./Interfaces/ContactInfo";
-
+import Parse from "parse";
 export class User extends Parse.User {
   constructor() {
     super({ className: 'User' });
+
+    this.set('contactInfo', { phone: '', email: '' });
   }
 
   get company(): Company {
@@ -44,6 +46,13 @@ export class User extends Parse.User {
 
   set contactInfo(value: ContactInfo) {
     this.set('contactInfo', value);
+  }
+  get img(): Parse.File {
+    return this.get('img');
+  }
+
+  set img(value: Parse.File) {
+    this.set('img', value);
   }
 }
 

@@ -1,6 +1,6 @@
 import {Apartment} from './Apartment';
 import {Payment} from './Interfaces/Payment';
-
+import Parse from 'parse';
 export class Contract extends Parse.Object {
   constructor() {
     super('Contract');
