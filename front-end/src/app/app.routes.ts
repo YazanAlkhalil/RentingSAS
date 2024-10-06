@@ -68,12 +68,12 @@ export const routes: Routes = [
                 import('./pages/apartments/apartments.component')
               .then( (m) => m.ApartmentsComponent )
             },
-            {
-              path:'reports',
-              loadComponent: () => 
-                import('./pages/reports/reports.component')
-              .then( (m) => m.ReportsComponent )
-            },
+            // {
+            //   path:'reports',
+            //   loadComponent: () => 
+            //     import('./pages/reports/reports.component')
+            //   .then( (m) => m.ReportsComponent )
+            // },
             {
               path:'clients',
               loadComponent: () => 

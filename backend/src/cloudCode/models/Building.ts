@@ -1,16 +1,16 @@
-import { Apartment } from "./Interfaces/Apartment";
+import { Company } from "./Company";
 import { Location } from "./Interfaces/Location";
 export class Building extends Parse.Object {
   constructor() {
     super('Building');
   }
 
-  get company_id(): Parse.Pointer {
-    return this.get('company_id');
+  get company(): Company {
+    return this.get('company');
   }
 
-  set company_id(value: Parse.Pointer) {
-    this.set('company_id', value);
+  set company(value: Company) {
+    this.set('company', value);
   }
 
   get name(): string {
@@ -45,13 +45,6 @@ export class Building extends Parse.Object {
     this.set('img', value);
   }
 
-  get apartment(): Apartment[] {
-    return this.get('apartment');
-  }
-
-  set apartment(value: Apartment[]) {
-    this.set('apartment', value);
-  }
 }
 
 Parse.Object.registerSubclass('Building', Building);

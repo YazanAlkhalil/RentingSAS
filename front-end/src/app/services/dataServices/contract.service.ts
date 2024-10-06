@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
 import { Pointer } from "parse";
-import { Payment } from "../../models/Interfaces/Payment";
+import { Payment } from "../../models/Payment";
 import { Contract } from "../../models/Contract";
-import { Client } from "../../models/Interfaces/Client";
+import { Client } from "../../models/Client";
 import { AuthService } from "../other/auth.service";
-import { Apartment } from "../../models/Interfaces/Apartment";
+import { Apartment } from "../../models/Apartment";
 import { Company } from "../../models/Company";
 import { Building } from "../../models/Building";
 
@@ -19,8 +19,7 @@ export class ContractService {
     const building_id = new Building()
     building_id.id = apartment.buildingId
     contract.set('building_id' , building_id)
-    contract.apartment_id = apartment.apartment._id
-    contract.set('paymentFrequency' , paymentFrequency)
+    contract.apartment = apartment.apartment
     return contract.save();
   }
 

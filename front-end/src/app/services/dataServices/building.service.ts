@@ -1,7 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Building } from "../../models/Building";
 import { Pointer, Query } from "parse";
-import { Apartment } from "../../models/Interfaces/Apartment";
 import { AuthService } from "../other/auth.service";
 @Injectable({
   providedIn: "root",
@@ -14,7 +13,7 @@ export class BuildingService {
     sortField: string;
     searchValue: string;
     withCount: boolean;
-    company_id: Pointer;
+    
   }): Promise<Building[]> {
     let query = new Query(Building);
 
@@ -32,7 +31,7 @@ export class BuildingService {
       .limit(data.limit)
       .descending("createdAt")
       .include([
-        "company_id",
+        "company",
         "name",
         "address",
         "location",
@@ -46,7 +45,8 @@ export class BuildingService {
     return query.find();
   }
   addBuilding(building: Building): Promise<Building> {
-    building.company_id = this.authService.getCurrentUser()?.get("company_id");
+    building.company = this.authService.getCurrentUser()?.get("company_id");
+    
     return building.save();
   }
   deleteBuilding(building: Building) {

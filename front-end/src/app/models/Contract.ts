@@ -1,26 +1,17 @@
-import { Client } from "./Interfaces/Client";
-import { Payment } from "./Interfaces/Payment";
-import Parse, { Pointer } from "parse";
-
+import {Apartment} from './Apartment';
+import { Payment } from './Payment';
+import Parse from 'parse';
 export class Contract extends Parse.Object {
   constructor() {
     super('Contract');
-    this.set('client' , {name:'' ,'contactInfo':{phone:'' , email:''} , img:''})
   }
 
-  get company_id(): Pointer{
-    return this.get('company_id')
+  get apartment(): Apartment {
+    return this.get('Apartment');
   }
 
-  set company_id(value: Pointer){
-    this.set('company_id' , value)
-  }
-  get building_id(): Pointer{
-    return this.get('company_id')
-  }
-
-  set building_id(value: Pointer){
-    this.set('company_id' , value)
+  set apartment(value: Apartment) {
+    this.set('apartment', value);
   }
 
   get startDate(): Date {
@@ -55,6 +46,14 @@ export class Contract extends Parse.Object {
     this.set('paymentFrequency', value);
   }
 
+  get balance(): number {
+    return this.get('balance');
+  }
+
+  set balance(value: number) {
+    this.set('balance', value);
+  }
+
   get deposit(): string {
     return this.get('deposit');
   }
@@ -78,23 +77,7 @@ export class Contract extends Parse.Object {
   set additionalInfo(value: string) {
     this.set('additionalInfo', value);
   }
-
-  get client(): Client {
-    return this.get('client');
-  }
-
-  set client(value: Client) {
-    this.set('client', value);
-  }
-
-  get apartment_id(): string {
-    return this.get('apartment_id');
-  }
-
-  set apartment_id(value: string) {
-    this.set('apartment_id', value);
-  }
-
+  
   get payments(): Payment[] {
     return this.get('payments');
   }

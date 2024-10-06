@@ -86,7 +86,7 @@ export class AdminService {
       user.set("username", InputUser.username);
       user.set("password",  InputUser.password);
       user.set("contactInfo", InputUser.contactInfo);
-      user.set("company_id", InputUser.company_id);
+      user.set("company", InputUser.company);
       user.set("img", InputUser.img); 
     return user.save()
   }
