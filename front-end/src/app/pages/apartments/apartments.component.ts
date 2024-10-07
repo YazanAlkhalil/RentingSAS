@@ -236,10 +236,10 @@ export class ApartmentsComponent {
           detail: "Apartment Added",
           life: 3000,
         });
+        this.apartmentDialog = false;
+        this.getApartments();
+        this.cd.detectChanges();
       });
-      this.apartmentDialog = false;
-      this.getApartments();
-      this.cd.detectChanges();
     }
   }
   editApartment(apartment: Apartment) {

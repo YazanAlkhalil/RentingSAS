@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { Building } from "../../models/Building";
 import { Pointer, Query } from "parse";
 import { AuthService } from "../other/auth.service";
+import { Company } from "../../models/Company";
 @Injectable({
   providedIn: "root",
 })
@@ -43,7 +44,10 @@ export class BuildingService {
     return query.find();
   }
   addBuilding(building: Building): Promise<Building> {
-    building.company = this.authService.getCurrentUser()?.get("company");
+    const company = new Company()
+    company.id = this.authService.getCurrentUser()?.get("company_id");
+    console.log(company,'company');
+    building.company = company;
     return building.save();
   }
   deleteBuilding(building: Building) {
