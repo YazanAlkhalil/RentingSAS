@@ -24,7 +24,11 @@ import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { PaginatorModule } from "primeng/paginator";
 import { Company } from "../../models/Company";
 import { DialogService, DynamicDialogRef } from "primeng/dynamicdialog";
-import { DataUrl, NgxImageCompressService, UploadResponse } from "ngx-image-compress";
+import {
+  DataUrl,
+  NgxImageCompressService,
+  UploadResponse,
+} from "ngx-image-compress";
 import { ImageCropperDialogComponent } from "./image-cropper-dialog/image-cropper-dialog.component";
 
 @Component({
@@ -49,9 +53,9 @@ import { ImageCropperDialogComponent } from "./image-cropper-dialog/image-croppe
     FormsModule,
     FileUploadModule,
     ImageModule,
-    PaginatorModule
+    PaginatorModule,
   ],
-  providers: [MessageService, ConfirmationService , DialogService],
+  providers: [MessageService, ConfirmationService, DialogService],
   templateUrl: "./buildings.component.html",
   styleUrl: "./buildings.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -59,7 +63,7 @@ import { ImageCropperDialogComponent } from "./image-cropper-dialog/image-croppe
 export class BuildingsComponent {
   buildingDialog: boolean = false;
   buildings: Building[] = [];
-  buildingsName: any[] = []
+  buildingsName: any[] = [];
   building: Building = new Building();
   submitted: boolean = false;
   skip: number = 0;
@@ -81,7 +85,7 @@ export class BuildingsComponent {
   };
   count: number = 0
   dataImage: string | null = null;
-  
+
   constructor(
     private buildingService: BuildingService,
     private messageService: MessageService,
@@ -89,9 +93,9 @@ export class BuildingsComponent {
     private cd: ChangeDetectorRef,
     private authService: AuthService,
     private imageCompress: NgxImageCompressService,
-    private dialogService: DialogService,
+    private dialogService: DialogService
   ) {}
-  private imageCropperDialogComponentRef: DynamicDialogRef | undefined
+  private imageCropperDialogComponentRef: DynamicDialogRef | undefined;
 
   getBuildings() : Building[]{
     this.buildingService
@@ -136,13 +140,15 @@ export class BuildingsComponent {
       message: "Are you sure you want to delete the selected buildings?",
       header: "Confirm",
       icon: "pi pi-exclamation-triangle",
-      rejectButtonStyleClass: 'p-button-secondary p-button-text',
-      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: "p-button-secondary p-button-text",
+      acceptButtonStyleClass: "p-button-danger",
       accept: () => {
         this.buildings = this.buildings.filter(
           (val) => !this.selectedBuildings?.includes(val)
         );
-        this.selectedBuildings!.forEach( (x) =>this.buildingService.deleteBuilding(x))
+        this.selectedBuildings!.forEach((x) =>
+          this.buildingService.deleteBuilding(x)
+        );
         this.selectedBuildings = null;
         this.messageService.add({
           severity: "success",
@@ -156,6 +162,7 @@ export class BuildingsComponent {
 
   editBuilding(building: Building) {
     this.building = building;
+    this.dataImage = this.building.img ? this.building.img.url() : null;
     this.buildingDialog = true;
   }
 
@@ -164,8 +171,8 @@ export class BuildingsComponent {
       message: "Are you sure you want to delete " + building.name + "?",
       header: "Confirm",
       icon: "pi pi-exclamation-triangle",
-      rejectButtonStyleClass: 'p-button-secondary p-button-text',
-      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: "p-button-secondary p-button-text",
+      acceptButtonStyleClass: "p-button-danger",
       accept: async () => {
         try {
           await this.buildingService.deleteBuilding(building);
@@ -190,15 +197,13 @@ export class BuildingsComponent {
   }
 
   hideDialog() {
-    this.building.revert()
+    this.building.revert();
     this.buildingDialog = false;
     this.submitted = false;
-    this.getBuildings()
-    this.cd.detectChanges()
+    this.getBuildings();
+    this.cd.detectChanges();
   }
   async saveBuilding() {
-    console.log(this.building,'bl');
-    
     this.submitted = true;
     if (this.building.name?.trim()) {
       if (this.building.id) {
@@ -221,16 +226,17 @@ export class BuildingsComponent {
                 detail: "Building Created",
                 life: 3000,
               });
-            }).catch((error:Error | any)=>{
+            })
+            .catch((error: Error | any) => {
               this.messageService.add({
                 severity: "error",
                 summary: "Error",
                 detail: error.message,
                 life: 3000,
               });
-            })
+            });
         } catch (error: Error | any) {
-          console.log(error);
+          console.log(error, "error");
           this.messageService.add({
             severity: "error",
             summary: "Error",
@@ -250,7 +256,7 @@ export class BuildingsComponent {
     const parseFile = new File(file.name, file);
     this.building.img = parseFile;
   }
-  
+
   changeProfilePic() {
     this.imageCompress.uploadFile().then(async ({ image }: UploadResponse) => {
       this.imageCropperDialogComponentRef = this.dialogService.open(
@@ -269,34 +275,19 @@ export class BuildingsComponent {
       );
       this.imageCropperDialogComponentRef.onClose.subscribe(async (img) => {
         if (img) {
-          // const image: DataUrl = await this.imageCompress.compressFile(
-          //   img,
-          //   -1,
-          //   100,
-          //   70,
-          //   1080,
-          //   1080
-          // );
-          // console.log(this.building.img,'image');
-          if (!this.building.img) {
-            this.building.img = img;
-            console.log(this.building.img,'img');
-          }
-          this.dataImage = img._data
-          console.log(this.dataImage,'di');
-          
+          this.building.img = img;
+          this.dataImage = "data:image/jpeg;base64," + img._data;
           this.cd.detectChanges();
         }
       });
     });
+    this.dataImage = null;
+    this.cd.detectChanges();
   }
 
   removeProfilePic() {
-    this.building.img?.destroy().then(() => {
-      this.building.unset("image");
-      this.dataImage = "";
-      // this.dynamicDialogConfig.data!.obj.save();
-      this.cd.detectChanges();
-    });
+    this.building.unset("img");
+    this.dataImage = "";
+    this.cd.detectChanges();
   }
 }
