@@ -19,38 +19,13 @@ Parse.Cloud.afterSave("Company", async (request) => {
     acl.setPublicWriteAccess(false);
     acl.setRoleReadAccess('admin', true);
     acl.setRoleWriteAccess('admin', true);
-    acl.setRoleReadAccess(companyRole.id, true);
-    acl.setRoleWriteAccess(companyRole.id, true);
+    acl.setRoleReadAccess(companyRole.getName(), true);
+    acl.setRoleWriteAccess(companyRole.getName(), true);
     company.setACL(acl);
     await company.save(null, { sessionToken});
   }
 });
 
 
-Parse.Cloud.afterDelete("Company", async (request) => {
-  const company = request.object;
-  const sessionToken = request.user?.getSessionToken();
-  const companyRole = await new Parse.Query(Parse.Role).equalTo("name", `${company.id}`).first({sessionToken});
-  if(companyRole){
-        const usersRelation = companyRole.getUsers();
-        const usersQuery = usersRelation.query();
-        console.log('==========usersQuery==========');
-        const users = await usersQuery.find();
-        console.log('==========usersQuery==========');
-
-        if (users.length > 0) {
-          await Parse.Object.destroyAll(users);
-        }
-
-        // Delete all users in one batch operation
-
-
-  }
-  new Parse.Query(Building).equalTo("company", company).find({sessionToken})
-  .then(Parse.Object.destroyAll)
-  .catch(err => {
-    console.log(err);
-  })
-});
 
 

@@ -1,41 +1,27 @@
 import {Company} from "../../models/Company"
 import {Building} from "../../models/Building"
-import {User} from "../../models/_User"
-import {Contract} from "../../models/Contract"
-import { Apartment } from "../../models/Apartment"
-
 
 Parse.Cloud.define("deleteCompany", async (req: Parse.Cloud.FunctionRequest) => {
-    const { id } = req.params;
-    console.log(id)
-    console.log(req.user)
-    const company = await new Parse.Query(Company).get(id);
-
-    // Delete related buildings and their contracts
-    const buildingQuery = new Parse.Query(Building);
-    buildingQuery.equalTo('company', company);
-    const buildings = await buildingQuery.find({useMasterKey: true});
-    const apartmentQuery = new Parse.Query(Apartment)
-    apartmentQuery.containedIn('building' , buildings)
-    const apartments = await apartmentQuery.find({useMasterKey:true})
-    
-    const contractQuery = new Parse.Query(Contract);
-    contractQuery.containedIn('apartment', apartments);
-    const contracts = await contractQuery.find();
-    Parse.Object.destroyAll(apartments , {useMasterKey:true})
-    Parse.Object.destroyAll(contracts,{useMasterKey:true});
-    Parse.Object.destroyAll(buildings,{useMasterKey:true});
-    
-    // Delete related users 
-    const userQuery = new Parse.Query(User);
-    userQuery.equalTo('company', company);
-    const users = await userQuery.find({useMasterKey: true});
-    console.log(users)
-    Parse.Object.destroyAll(users,{useMasterKey:true});
-
-    
-
-    // Finally delete the company
-    await company.destroy({useMasterKey: true});
-    return company;
+    const company = req.params;
+  const sessionToken = req.user?.getSessionToken();
+  const companyRole = await new Parse.Query(Parse.Role).equalTo("name", `${company.id}`).first({sessionToken});
+  if(companyRole){
+        const usersRelation = companyRole.getUsers();
+        const usersQuery = usersRelation.query();
+        const users = await usersQuery.find({sessionToken});
+        if (users.length > 0) {
+          await Parse.Object.destroyAll(users,{sessionToken});
+        }
+  }
+  new Parse.Query(Building).equalTo("company", company).find({sessionToken})
+  .then(Parse.Object.destroyAll)
+  .catch(err => {
+    console.log(err);
+  })
+  const companyQuery = new Parse.Query(Company);
+  companyQuery.equalTo("objectId", company.id);
+  const companyObject = await companyQuery.first({sessionToken});
+  if(companyObject){
+    await companyObject.destroy({sessionToken});
+  }
 });

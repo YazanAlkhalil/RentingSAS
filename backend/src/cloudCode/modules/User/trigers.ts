@@ -28,8 +28,8 @@ Parse.Cloud.afterSave(Parse.User, async (request) => {
           const acl = new Parse.ACL();
           acl.setRoleReadAccess('admin', true);
           acl.setRoleWriteAccess('admin', true);
-          acl.setRoleReadAccess(companyRole.id, true);
-          acl.setRoleWriteAccess(companyRole.id, true);
+          acl.setRoleReadAccess(companyRole.getName(), true);
+          acl.setRoleWriteAccess(companyRole.getName(), true);
           user.setACL(acl);
           await user.save(null, {sessionToken});
       }    
