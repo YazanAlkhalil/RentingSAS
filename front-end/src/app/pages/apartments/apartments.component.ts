@@ -201,10 +201,10 @@ export class ApartmentsComponent {
       });
     })
   }
-  moreDetails(apartment: { apartment: Apartment }) {
-    console.log(apartment);
+  moreDetails(apartment: Apartment) {
+    console.log(apartment , 'ss');
 
-    this.apartment = apartment.apartment
+    this.apartment = apartment
     this.moreDetailsDialog = true
   }
 
@@ -228,6 +228,7 @@ export class ApartmentsComponent {
       const buildingPointer = new Building()
       buildingPointer.id = this.selectedBuilding.id
       this.apartment.building = buildingPointer 
+      this.apartment.amenities = this.selectedAmenities 
       this.apartmentService.addApartment(this.apartment).then(() => {
         this.msg.add({
           severity: "success",
@@ -236,63 +237,28 @@ export class ApartmentsComponent {
           life: 3000,
         });
       });
-
-      //   this.buildings.find((building) => {
-      //     const apartment = building.apartment.findIndex(
-      //       (apartment) => apartment._id == this.apartment._id
-      //     );
-      //     if (apartment !== -1) {
-      //       this.apartment.amenities = this.selectedAmenities;
-      //       building.apartment[apartment] = this.apartment;
-      //       building.save().then(() => {
-      //         this.apartmentDialog = false;
-      //         this.msg.add({
-      //           severity: "success",
-      //           summary: "Successful",
-      //           detail: "Apartment Updated",
-      //           life: 3000,
-      //         });
-      //         // this.getApartments();
-      //       });
-      //       return true;
-
-      //     }
-      //     return false;
-      //   });
-
-      //   return;
-      // }
-      // const buildingIndex = this.buildings.findIndex(
-      //   (building) => this.selectedBuilding.id === building.id
-      // );
-      // console.log(buildingIndex);
-
-      // if (buildingIndex !== -1) {
-      //   this.apartment._id = this.createId();
-      //   this.apartment.amenities = this.selectedAmenities;
-      //   this.buildings[buildingIndex].apartment.push(this.apartment);
-      //   await this.buildings[buildingIndex].save();
       this.apartmentDialog = false;
       this.getApartments();
       this.cd.detectChanges();
     }
   }
-  editApartment(apartment: {
-    apartment: Apartment;
-    buildingName: string;
-    buildingId: string;
-  }) {
+  editApartment(apartment: Apartment) {
+    console.log(apartment.building, "building");
     this.selectedBuilding = {
-      name: apartment.buildingName,
-      id: apartment.buildingId,
+      name: apartment.building.name,
+      id: apartment.building.id,
     };
-    this.apartment = apartment.apartment;
+    console.log(this.selectedBuilding, "apartment");
+
+    this.apartment = apartment;
     console.log(this.apartment, "app");
     this.apartmentDialog = true;
-    this.selectedAmenities = apartment.apartment.amenities;
+    this.selectedAmenities = apartment.amenities;
   }
 
   deleteApartment(apartment: Apartment) {
+    console.log(apartment, "ap");
+    this.apartment = apartment
     this.confirmationService.confirm({
       message: "Are you sure you want to delete this apartment ?",
       header: "Confirm",
