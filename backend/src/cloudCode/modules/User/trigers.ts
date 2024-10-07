@@ -2,7 +2,6 @@
 Parse.Cloud.beforeSave(Parse.User, (request) => {
   const user = request.object;
   if (user.isNew()) {
-    console.log('newwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww')
     const acl = new Parse.ACL();
     acl.setPublicReadAccess(true);
     acl.setPublicWriteAccess(false);

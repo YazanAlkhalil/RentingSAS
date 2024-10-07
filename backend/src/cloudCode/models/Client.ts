@@ -1,5 +1,6 @@
 import {Contract} from './Contract';
 import {ContactInfo} from './Interfaces/ContactInfo';
+import { Company } from './Company';
 
 export class Client extends Parse.Object {
   constructor() {
@@ -10,6 +11,12 @@ export class Client extends Parse.Object {
   }
   set contract(value: Contract) {
     this.set('contract', value);
+  }
+  get company(): Company {
+    return this.get('company');
+  }
+  set company(value: Company) {
+    this.set('company', value);
   }
   get name(): string {
     return this.get('name');
