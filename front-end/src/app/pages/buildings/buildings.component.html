@@ -127,11 +127,13 @@
     <ng-template pTemplate="content">
       <div class="field p-nogutter">
         <label for="image">Image</label>
-        <div class="flex flex-col justify-center items-center w-full relative">
+         <div class="flex flex-col justify-center items-center w-full relative">
           <img
+            *ngIf="building.img"
             [src]="
               dataImage
-                
+                ? dataImage
+                : ''
             "
             class="w-[100%] max-h-[60%]"
           />

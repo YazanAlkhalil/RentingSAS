@@ -58,6 +58,8 @@ export class ImageCropperDialogComponent implements OnInit {
     
   }
   doneCropping() {
+    console.log('any thing!');
+    console.log(this.croppedImage,'cropped');
     this.dynamicDialogRef.close(this.croppedImage);
   }
 }
