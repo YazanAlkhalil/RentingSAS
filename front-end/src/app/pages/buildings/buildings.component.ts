@@ -22,6 +22,10 @@ import { File } from "parse";
 import { ImageModule } from "primeng/image";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { PaginatorModule } from "primeng/paginator";
+import { Company } from "../../models/Company";
+import { DialogService, DynamicDialogRef } from "primeng/dynamicdialog";
+import { DataUrl, NgxImageCompressService, UploadResponse } from "ngx-image-compress";
+import { ImageCropperDialogComponent } from "./image-cropper-dialog/image-cropper-dialog.component";
 
 @Component({
   selector: "app-buildings",
@@ -47,7 +51,7 @@ import { PaginatorModule } from "primeng/paginator";
     ImageModule,
     PaginatorModule
   ],
-  providers: [MessageService, ConfirmationService],
+  providers: [MessageService, ConfirmationService , DialogService],
   templateUrl: "./buildings.component.html",
   styleUrl: "./buildings.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -75,13 +79,18 @@ export class BuildingsComponent {
     sortField: "name",
     withCount: false,
   };
+  dataImage: string | null = null;
+  
   constructor(
     private buildingService: BuildingService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private cd: ChangeDetectorRef,
-    private authService: AuthService
+    private authService: AuthService,
+    private imageCompress: NgxImageCompressService,
+    private dialogService: DialogService,
   ) {}
+  private imageCropperDialogComponentRef: DynamicDialogRef | undefined
 
   getBuildings() : Building[]{
     this.buildingService
@@ -101,8 +110,7 @@ export class BuildingsComponent {
 
   openNew() {
     this.building = new Building();
-    console.log(this.building , 'll');
-    
+    this.building.company = this.authService.getCurrentUser()?.get('company')
     this.building.location.longitude = ''
     this.building.location.latitude = ''
     console.log(this.building,'bb');
@@ -234,5 +242,54 @@ export class BuildingsComponent {
     const file = event.files[0];
     const parseFile = new File(file.name, file);
     this.building.img = parseFile;
+  }
+  
+  changeProfilePic() {
+    this.imageCompress.uploadFile().then(async ({ image }: UploadResponse) => {
+      this.imageCropperDialogComponentRef = this.dialogService.open(
+        ImageCropperDialogComponent,
+        {
+          header: ".",
+          footer: ".",
+          data: {
+            aspectRatio: 1.5,
+            imageBase64: image,
+            format: "webp",
+            max_image_width: 400,
+            maintainAspectRatio: false,
+          },
+        }
+      );
+      this.imageCropperDialogComponentRef.onClose.subscribe(async (img) => {
+        if (img) {
+          // const image: DataUrl = await this.imageCompress.compressFile(
+          //   img,
+          //   -1,
+          //   100,
+          //   70,
+          //   1080,
+          //   1080
+          // );
+          // console.log(this.building.img,'image');
+          if (!this.building.img) {
+            this.building.img = img;
+            console.log(this.building.img,'img');
+          }
+          this.dataImage = img._data
+          console.log(this.dataImage,'di');
+          
+          this.cd.detectChanges();
+        }
+      });
+    });
+  }
+
+  removeProfilePic() {
+    this.building.img?.destroy().then(() => {
+      this.building.unset("image");
+      this.dataImage = "";
+      // this.dynamicDialogConfig.data!.obj.save();
+      this.cd.detectChanges();
+    });
   }
 }

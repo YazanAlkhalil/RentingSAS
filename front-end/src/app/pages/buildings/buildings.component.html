@@ -123,25 +123,45 @@
     [style]="{ width: '450px' }"
     header="Building Details"
     [modal]="true"
-    styleClass="p-fluid"
   >
     <ng-template pTemplate="content">
       <div class="field p-nogutter">
         <label for="image">Image</label>
-        <div class="p-fileupload-wrapper" style="width: 100%">
-          <p-fileUpload
-            [multiple]="false"
-            name="image"
-            accept="image/*"
-            [maxFileSize]="1000000"
-            (onSelect)="onImageUpload($event)"
-            [auto]="false"
-            chooseLabel="Select Image"
+        <div class="flex flex-col justify-center items-center w-full relative">
+          <img
+            [src]="
+              dataImage
+                
+            "
+            class="w-[100%] max-h-[60%]"
+          />
+          <p-button
+            size="large"
+            *ngIf="building.img"
+            icon="pi pi-trash pi-xl"
+            [rounded]="true"
+            [outlined]="false"
+            (click)="removeProfilePic()"
+            class="absolute top-0 right-0 m-2"
+          ></p-button>
+        </div>
+        <div class="flex flex-col justify-center items-center">
+          <p-button
+            size="large"
+            *ngIf="!building.img"
+            icon="pi pi-cloud-upload pi-xl"
+            [rounded]="true"
+            [outlined]="true"
+            (click)="changeProfilePic()"
+          ></p-button>
+          <span
+            class="text-xs capitalize text-center my-2"
+            *ngIf="!building.img"
+            >{{ "upload_image" | translate }}</span
           >
-          </p-fileUpload>
         </div>
       </div>
-      <div class="field">
+      <div class="field  p-fluid">
         <label for="name">Name</label>
         <input
           type="text"
@@ -155,7 +175,7 @@
           Name is required.
         </small>
       </div>
-      <div class="field">
+      <div class="field  p-fluid">
         <label for=" address ">Address</label>
         <textarea
           pInputTextarea
@@ -172,7 +192,7 @@
           Address is required.
         </small>
       </div>
-      <div class="field">
+      <div class="field p-fluid">
         <label for="location-longitude"> Longitude </label>
         <input
           type="text"
@@ -189,7 +209,7 @@
           Longitude Location Is required.
         </small>
       </div>
-      <div class="field">
+      <div class="field p-fluid">
         <label for="location-latitude"> Latitude </label>
         <input
           type="text"

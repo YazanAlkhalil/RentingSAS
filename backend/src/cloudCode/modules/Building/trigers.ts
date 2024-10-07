@@ -8,14 +8,15 @@ Parse.Cloud.afterSave(Building, async (request) => {
         if (companyId) {
             const companyRoleQuery = new Parse.Query(Parse.Role)
                 .equalTo("name", `${companyId}`)
-            const companyRole = await companyRoleQuery.first({sessionToken});
-
+                const companyRole = await companyRoleQuery.first({sessionToken});
             if (companyRole) {
                 const acl = new Parse.ACL();
                 acl.setPublicReadAccess(false)
                 acl.setPublicWriteAccess(false)
                 acl.setRoleReadAccess(companyRole.getName(), true);
                 acl.setRoleWriteAccess(companyRole.getName(), true);
+                acl.setRoleReadAccess('admin', true);
+                acl.setRoleWriteAccess('admin', true);
                 building.setACL(acl);
                 await building.save(null, {sessionToken});
             }

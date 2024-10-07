@@ -23,6 +23,8 @@ Parse.Cloud.afterSave(Expenses, async (request) => {
                         acl.setPublicWriteAccess(false)
                         acl.setRoleReadAccess(companyRole.getName(), true);
                         acl.setRoleWriteAccess(companyRole.getName(), true);
+                        acl.setRoleReadAccess('admin', true);
+                        acl.setRoleWriteAccess('admin', true);
                         expenses.setACL(acl);
                         await expenses.save(null, {useMasterKey: true});
                     }

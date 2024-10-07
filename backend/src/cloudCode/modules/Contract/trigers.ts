@@ -8,10 +8,10 @@ Parse.Cloud.afterSave(Contract, async (request) => {
     if(!contract.existed()){
         const apartmentId = contract.get("apartment")?.id;
         if (apartmentId) {
-            const apartment = await new Parse.Query(Apartment).get(apartmentId);
+            const apartment = await new Parse.Query(Apartment).get(apartmentId,{sessionToken});
             if(apartment){
                 const buildingId = apartment.get("building")?.id;
-                const building = await new Parse.Query(Building).get(buildingId);
+                const building = await new Parse.Query(Building).get(buildingId,{sessionToken});
                 if(building){
                     const companyId = building.get("company")?.id;
                     const companyRoleQuery = new Parse.Query(Parse.Role)
@@ -23,6 +23,8 @@ Parse.Cloud.afterSave(Contract, async (request) => {
                         acl.setPublicWriteAccess(false)
                         acl.setRoleReadAccess(companyRole.getName(), true);
                         acl.setRoleWriteAccess(companyRole.getName(), true);
+                        acl.setRoleReadAccess('admin', true);
+                acl.setRoleWriteAccess('admin', true);
                         contract.setACL(acl);
                         await contract.save(null, {sessionToken});
                     }

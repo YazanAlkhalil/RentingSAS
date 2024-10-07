@@ -10,8 +10,8 @@ Parse.Cloud.afterSave("Company", async (request) => {
     roleACL.setPublicWriteAccess(false);
     roleACL.setRoleReadAccess('admin', true);
     roleACL.setRoleWriteAccess('admin', true);
-
     const companyRole = new Parse.Role(`${company.id}`, roleACL);
+    roleACL.setRoleReadAccess(companyRole.getName(), true); 
     await companyRole.save(null, { sessionToken });
 
     const acl = new Parse.ACL();

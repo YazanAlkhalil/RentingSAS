@@ -14,6 +14,8 @@ Parse.Cloud.afterSave(Client, async (request) => {
                 acl.setPublicWriteAccess(false)
                 acl.setRoleReadAccess(companyRole.getName(), true);
                 acl.setRoleWriteAccess(companyRole.getName(), true);
+                acl.setRoleReadAccess('admin', true);
+                acl.setRoleWriteAccess('admin', true);
                 client.setACL(acl);
                 await client.save(null, {sessionToken});
             }
