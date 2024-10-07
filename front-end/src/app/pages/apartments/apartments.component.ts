@@ -240,6 +240,7 @@ export class ApartmentsComponent {
         this.getApartments();
         this.cd.detectChanges();
       });
+      console.log(this.apartment , 'ap');
     }
   }
   editApartment(apartment: Apartment) {
@@ -278,11 +279,13 @@ export class ApartmentsComponent {
       },
     });
   }
+  
 
   onImageUpload(event: any) {
     const file = event.files[0];
     const parseFile = new Parse.File(file.name, file);
-    this.apartment.imgs.push(parseFile);
+    console.log(parseFile , 'pf');
+    this.apartment.imgs?.push(parseFile);
     console.log(this.apartment.imgs, "imgs");
   }
 
