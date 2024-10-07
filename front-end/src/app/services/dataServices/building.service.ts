@@ -13,7 +13,6 @@ export class BuildingService {
     sortField: string;
     searchValue: string;
     withCount: boolean;
-    
   }): Promise<Building[]> {
     let query = new Query(Building);
 
@@ -36,7 +35,6 @@ export class BuildingService {
         "address",
         "location",
         "img",
-        "apartment",
       ]);
 
     if (data.withCount) {
@@ -45,8 +43,7 @@ export class BuildingService {
     return query.find();
   }
   addBuilding(building: Building): Promise<Building> {
-    building.company = this.authService.getCurrentUser()?.get("company_id");
-    
+    building.company = this.authService.getCurrentUser()?.get("company");
     return building.save();
   }
   deleteBuilding(building: Building) {
@@ -59,7 +56,4 @@ export class BuildingService {
     return query.first();
   }
 
-  updateBuilding(building: Building): Promise<Building> {
-    return building.save();
-  }
 }
