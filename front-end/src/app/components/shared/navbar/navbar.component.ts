@@ -67,7 +67,6 @@ export class NavbarComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.currentTheme = localStorage.getItem("theme") || "light";
     this.isLanguageEnglish = this.changelangService.currentLang() === "en";
-    await this.authService.getCurrentUser()?.fetchWithInclude(["profilePic"]);
   }
 
   toggleLang() {

@@ -97,10 +97,6 @@ export class BuildingsComponent {
   }
   ngOnInit() {
     this.getBuildings();
-    this.authService.getCurrentUser();
-    console.log(this.authService.getCurrentUser()?.get('username'),'user');
-    console.log(this.authService.getCurrentUser() ,'user');
-    console.log(this.authService.getCurrentUser()?.get('contactInfo').phone,'user');
   }
 
   openNew() {
