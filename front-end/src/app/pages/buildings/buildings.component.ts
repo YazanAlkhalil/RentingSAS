@@ -81,8 +81,9 @@ export class BuildingsComponent {
     limit: 5,
     searchValue: "",
     sortField: "name",
-    withCount: false,
+    withCount: true,
   };
+  count: number = 0
   dataImage: string | null = null;
 
   constructor(
@@ -96,11 +97,23 @@ export class BuildingsComponent {
   ) {}
   private imageCropperDialogComponentRef: DynamicDialogRef | undefined;
 
-  getBuildings(): Building[] {
-    this.buildingService.getBuildings(this.data).then((data: Building[]) => {
-      this.buildings = data;
-    });
-    return this.buildings;
+  getBuildings() : Building[]{
+    this.buildingService
+      .getBuildings(this.data)
+      .then((data: Building[] | {count: number, results: Building[]}) => {
+        if ('results' in data) {
+          this.buildings = data.results;
+          this.count = data.count
+          this.buildingsName = data.results.map((x: Building) => x.name);
+        } else {
+          this.buildings = data;
+          this.buildingsName = data.map((x: Building) => x.name);
+        }
+        this.cd.detectChanges();
+        console.log(this.buildings,'bds');
+        console.log(this.buildingsName,'names');
+      });
+      return this.buildings
   }
   ngOnInit() {
     this.getBuildings();
@@ -206,7 +219,7 @@ export class BuildingsComponent {
           this.buildingService
             .addBuilding(this.building)
             .then((building) => {
-              this.buildings.unshift(building);
+              this.getBuildings()
               this.messageService.add({
                 severity: "success",
                 summary: "Successful",

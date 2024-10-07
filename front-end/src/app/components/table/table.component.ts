@@ -219,7 +219,7 @@ export class TableComponent implements OnInit {
             skip: 0,
             limit: 10
           }).then(company => {
-            this.companies.unshift(company);
+            this.getCompanies()
             this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Company Created', life: 3000 });
           });
         } catch (error: ParseError | any) {

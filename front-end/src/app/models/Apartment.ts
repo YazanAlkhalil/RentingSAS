@@ -3,6 +3,7 @@ import Parse from 'parse';
 export class Apartment extends Parse.Object {
   constructor() {
     super('Apartment');
+    this.set('imgs',[])
   }
   get building(): Building {
     return this.get('building');
