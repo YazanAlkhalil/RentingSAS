@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Building } from "../../models/Building";
-import { Pointer, Query } from "parse";
+import {  Query } from "parse";
 import { AuthService } from "../other/auth.service";
 import { Company } from "../../models/Company";
 @Injectable({
@@ -15,8 +15,9 @@ export class BuildingService {
     searchValue: string;
     withCount: boolean;
   }): Promise<Building[]> {
+    const company = this.authService.getCurrentUser()?.get("company");
     let query = new Query(Building);
-
+    query.equalTo("company", company);
     if (data.searchValue) {
       const re = RegExp(
         `${data?.searchValue?.replace("+", "\\+").replace("-", "\\-")}`,
@@ -44,10 +45,7 @@ export class BuildingService {
     return query.find();
   }
   addBuilding(building: Building): Promise<Building> {
-    const company = new Company()
-    company.id = this.authService.getCurrentUser()?.get("company_id");
-    console.log(company,'company');
-    building.company = company;
+    building.company = this.authService.getCurrentUser()?.get("company");;
     return building.save();
   }
   deleteBuilding(building: Building) {

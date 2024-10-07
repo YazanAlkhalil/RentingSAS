@@ -5,7 +5,7 @@ import { AuthService } from "../other/auth.service";
 export const adminGuard: CanActivateChildFn = async (childRoute, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
-    console.log(authService.isAdmin());
+    console.log(authService.isAdmin(),'sssssssss');
     
   if (await authService.isAdmin()) {
     return true;

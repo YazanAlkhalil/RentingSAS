@@ -127,15 +127,20 @@ export class UsersComponent implements OnInit {
     constructor(private cd: ChangeDetectorRef) {}
 
     ngOnInit() {
-        const company_id = Parse.User.current()?.attributes["company_id"];
-        if(!company_id) return;
+        console.log(Parse.User.current());
+        
+        const company = Parse.User.current()?.attributes['company'];
+        console.log(company);
+        
+        if(!company) return;
         const query = new Parse.Query(User);
-        query.equalTo('company_id', company_id);
+        query.equalTo('company', company);
         
         query.find().then((users) => {
           
           this.users = users;
           this.loading = false;
+          console.log(users,'sss')
           this.cd.detectChanges();
         }).catch((error) => {
           console.log(error);

@@ -62,6 +62,7 @@ export class AuthComponent {
     this.authService
       .logIn(this.username.trim(), this.password.trim())
       .then(async (user: User) => {
+        console.log(user, 'user');
         if(await this.authService.isAdmin()){
           this.router.navigate(['/admin']);
         }else{

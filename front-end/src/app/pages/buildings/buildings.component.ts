@@ -108,9 +108,10 @@ export class BuildingsComponent {
 
   openNew() {
     this.building = new Building();
-    this.dataImage = null;
-    this.building.location.longitude = "";
-    this.building.location.latitude = "";
+    this.building.company = this.authService.getCurrentUser()?.get('company')
+    this.building.location.longitude = ''
+    this.building.location.latitude = ''
+    console.log(this.building,'bb');
     this.submitted = false;
     this.buildingDialog = true;
   }
