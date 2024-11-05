@@ -12,15 +12,6 @@ export class AuthService {
     return await User.logIn(username, password);
   }
 
-  async signUp(){
-    const user = new User()
-    user.set('username' , 'me')
-    user.set('password' , '12345'),
-    user.set('company_id' , 'TIqTqXgve1')
-    console.log(user, 'user');
-    return await user.save()
-    
-  }
 
   async logOut(): Promise<User> {
     return await User.logOut();
@@ -60,4 +51,74 @@ export class AuthService {
         return false;
     }
   }
+
+
+  
+  // sessionToken: string = localStorage.getItem('sessionToken') || '';
+  // user!: any;
+  // async logIn(username: string, password: string): Promise<any> {
+  //   try {
+  //     const user: any = await firstValueFrom(this.http.post('http://localhost:1337/parse/login', {
+  //       username,
+  //       password
+  //     }, {
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       }
+  //     }));
+  //     if (user?.sessionToken) {
+  //       this.sessionToken = user.sessionToken;
+  //       localStorage.setItem('sessionToken', this.sessionToken);
+  //       console.log(this.sessionToken, 'sessionToken');
+  //       this.user = user;
+  //     }
+  //     return user;
+  //   } catch (error) {
+  //     return false;
+  //   }
+  // }
+
+  // async logOut() {
+  //   this.http.post('http://localhost:1337/parse/logout', {}, {
+  //   })
+  //   this.sessionToken = '';
+  // }
+
+  // async isLoggedIn(): Promise<boolean> {
+  //   if (this.sessionToken) {
+  //     return true;
+  //   }
+
+  //   this.router.navigate(["/login"]);
+  //   return false;
+  // }
+
+  // getCurrentUser(): User | undefined {
+  //   return this.user;
+  // }
+
+  // getUsername(): string | undefined {
+  //   return this.user ? this.user.username : "";
+  // }
+
+
+  // async isAdmin(): Promise<boolean> {
+  //   try {
+  //     const response = await firstValueFrom(
+  //       this.http.post<{ result: boolean }>('http://localhost:1337/parse/functions/isAdmin', {
+  //         user: this.user
+  //       },
+  //       {
+  //         headers: {
+  //           'X-Parse-Session-Token': this.sessionToken
+  //         }
+  //       }
+  //     )
+  //     );
+  //     return response.result;
+  //   } catch (error) {
+  //     console.error('Error checking user role:', error);
+  //     return false;
+  //   }
+  // }
 }

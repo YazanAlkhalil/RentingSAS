@@ -1,1 +1,197 @@
-<p>contracts works!</p>
+<div class="card">
+    <p-toast />
+    <!-- <p-toolbar styleClass="mb-4 gap-2">
+        <ng-template pTemplate="left">
+            <p-button severity="success" label="New" icon="pi pi-plus" class="mr-2" (onClick)="openNew()" />
+            <p-button severity="danger" label="Delete" icon="pi pi-trash" (onClick)="deleteSelectedProducts()"
+                [disabled]="!contracts || !contracts.length" />
+        </ng-template>
+    </p-toolbar> -->
+    <div class="flex justify-content-center align-items-center" *ngIf="loading">
+        <p-progressSpinner ariaLabel="loading" />
+    </div>
+    <p-table #dt 
+        *ngIf="!loading"
+        [value]="contracts" [rows]="10" 
+        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="selectedContracts" [rowHover]="true" dataKey="id"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [showCurrentPageReport]="true"
+        (onSort)="onSort($event)"
+        [sortMode]="'single'"
+        [lazy]="true"
+        [sortField]="data.sortField"
+        [sortOrder]="data.sortOrder"
+    >
+        <ng-template pTemplate="caption">
+            <div class="flex align-items-center justify-content-between">
+                <h5 class="m-0 font-bold text-2xl">Manage Contracts</h5>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input #searchInput pInputText type="text" placeholder="Search..." />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="min-width:15rem">
+                    Apartment 
+                </th>
+                <th pSortableColumn="startDate" style="min-width:15rem">
+                    Start Date <p-sortIcon field="startDate" />
+                </th>
+                <th pSortableColumn="endDate" style="min-width:15rem">
+                    End Date <p-sortIcon field="endDate" />
+                </th>
+                <th pSortableColumn="rentAmount" style="min-width:10rem">
+                    Rent Amount <p-sortIcon field="rentAmount" />
+                </th>
+                <th  style="min-width:10rem">
+                    Payment Frequency 
+                </th>
+                <th  style="min-width:10rem">
+                    Expired 
+                </th>
+                <th  style="min-width:10rem">
+                    Type 
+                </th>
+                <th  style="min-width:10rem">
+                    Client Name 
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-contract>
+            <tr>
+                <td>
+                    {{ contract.attributes.apartment.attributes.name }}
+                </td>
+                <td>
+                    {{ contract.get('startDate') | date:'dd/MM/yyyy' }}
+                </td>
+                <td>
+                    {{ contract.get('endDate') | date:'dd/MM/yyyy' }}
+                </td>
+                <td>
+                    {{ contract.get('rentAmount') }}
+                </td>
+                <td>
+                    {{ contract.get('paymentFrequency') }}
+                </td>
+                <td>
+                    <ng-container *ngIf="contract.get('endDate') > today; else expired">
+                        {{ contract.get('endDate').getTime() - today.getTime() | duration }}
+                    </ng-container>
+                    <ng-template #expired>Expired</ng-template>
+                </td>
+                <td>
+                    {{ contract.get('type') }}
+                </td>
+                <td>
+                    {{ contract.get('client').attributes.name }}
+                </td>
+                <td>
+                    <!-- <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" severity="success"
+                        (onClick)="editContract(contract)" /> -->
+                    <p-button icon="pi pi-dollar" class="mr-2" [rounded]="true" [outlined]="true" severity="info"
+                        (onClick)="openPaymentsDialog(contract)" />
+                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                        (onClick)="deleteContract(contract)" />
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+            <div class="flex align-items-center justify-content-between">
+                In total there are {{ count ? count : 0 }} products.
+            </div>
+        </ng-template>
+    </p-table>
+
+    <p-paginator 
+        [first]="data.pageIndex"
+        [rows]="data.pageSize" 
+        [totalRecords]="count" 
+        [rowsPerPageOptions]="[10, 25, 50, 100]"
+        (onPageChange)="onPageChange($event)"
+    ></p-paginator>
+
+    <p-dialog [(visible)]="contractDialog" [style]="{ width: '450px' }" header="Contract Details" [modal]="true">
+
+        <ng-template pTemplate="content">
+            <div class="field p-fluid mt-2">
+                <label for="s-date">Start Date</label>
+                <p-calendar id="s-date" [(ngModel)]="contract.startDate" [required]="true" />
+                <small class="p-error" *ngIf="submitted && !contract.startDate">
+                    Start Date is required.
+                </small>
+            </div>
+            <div class="field p-fluid">
+                <label for="e-date">End Date</label>
+                <p-calendar id="e-date" [(ngModel)]="contract.endDate" [required]="true" />
+                <small class="p-error" *ngIf="submitted && !contract.endDate">
+                    End Date is required.
+                </small>
+            </div>
+            <div class="field p-fluid">
+                <label for="rent">Rent Amount</label>
+                <p-inputNumber id="rent" [(ngModel)]="contract.rentAmount" [required]="true" />
+                <small class="p-error" *ngIf="submitted && !contract.rentAmount">Rent Amount is required.</small>
+            </div>
+            <div class="field p-fluid">
+                <label for="type">Type</label>
+                <p-dropdown id="type" [(ngModel)]="contract.type" [options]="typeOptions" [required]="true"
+                    placeholder="Select a type">
+                </p-dropdown>
+                <small class="p-error" *ngIf="submitted && !contract.type">Type is
+                    required.</small>
+            </div>
+            <div class="field p-fluid">
+                <p-dropdown [(ngModel)]="contract.paymentFrequency" [options]="paymentFrequencyOptions"
+                    [required]="true" placeholder="Select a payment Frequency">
+                </p-dropdown>
+                <small class="p-error" *ngIf="submitted && !contract.paymentFrequency">Payment Frequency is
+                    required.</small>
+            </div>
+
+            <div class="field p-fluid">
+                <label for="m-terms"> Maintenance Terms </label>
+                <textarea pInputTextarea [(ngModel)]="contract.maintenanceTerms" required rows="3" cols="20"
+                    id="m-terms">
+            </textarea>
+            </div>
+            <div class="field p-fluid">
+                <label for="s-terms"> Special Terms </label>
+                <textarea pInputTextarea [(ngModel)]="contract.specialTerms" required rows="3" cols="20" id="s-terms">
+            </textarea>
+            </div>
+            <div class="field p-fluid">
+                <p-multiSelect [(ngModel)]="contract.utilitiesToPay" [options]="utilitiesToPayOptions"
+                    [required]="false" placeholder="Select utilities To Pay">
+                </p-multiSelect>
+            </div>
+            <div class="field p-fluid">
+                <label for="client">Client</label>
+                <p-dropdown id="client" [(ngModel)]="selectedClient" [options]="clients"
+                    [optionLabel]="'attributes.name'" [required]="true" placeholder="Select a client">
+                </p-dropdown>
+                <small class="p-error" *ngIf="submitted && !selectedClient">
+                    Client is required.
+                </small>
+            </div>
+            <div class="field p-fluid">
+                <label for="infos"> Additional Infos </label>
+                <textarea pInputTextarea [(ngModel)]="contract.additionalInfo" rows="3" cols="20" id="infos">
+            </textarea>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <p-button label="Cancel" icon="pi pi-times" [text]="true" severity="secondary" (onClick)="hideDialog()" />
+            <p-button label="Save" icon="pi pi-check" severity="primary" (onClick)="saveContract()" />
+        </ng-template>
+    </p-dialog>
+
+    
+        <!-- <app-payments-dialog (onClose)="goBack()">
+        </app-payments-dialog> -->
+    <p-confirmDialog [style]="{ width: '450px' }" />
+</div>

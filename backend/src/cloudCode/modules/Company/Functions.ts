@@ -19,9 +19,6 @@ Parse.Cloud.define("deleteCompany", async (req: Parse.Cloud.FunctionRequest) => 
     companyQuery.equalTo("objectId", company.id);
     const companyObject = await companyQuery.first({ sessionToken });
 
-    console.log('==========companyObject==========');
-    console.log(companyObject, 'companyObject');
-    console.log('==========companyObject==========');
 
 
     if (companyObject) {
@@ -30,17 +27,13 @@ Parse.Cloud.define("deleteCompany", async (req: Parse.Cloud.FunctionRequest) => 
                 .equalTo("company", companyObject.toPointer())
                 .find({ sessionToken });
 
-            console.log('==========buildings==========');
-            console.log(buildings, 'buildings');
-            console.log('==========buildings==========');
+            
 
             const apartments = await new Parse.Query(Apartment)
                 .containedIn("building", buildings)
                 .find({ sessionToken });
 
-            console.log('==========apartments==========');
-            console.log(apartments, 'apartments');
-            console.log('==========apartments==========');
+            ;
 
             await Promise.all([
                 Parse.Object.destroyAll(apartments,{sessionToken}),
@@ -53,3 +46,60 @@ Parse.Cloud.define("deleteCompany", async (req: Parse.Cloud.FunctionRequest) => 
         await companyObject.destroy({ sessionToken });
     }
 });
+
+
+Parse.Cloud.define("getCompanies", async (req: Parse.Cloud.FunctionRequest) => {
+    const sessionToken = req.user?.getSessionToken();
+    const data = req.params;
+    let query = new Parse.Query(Company);
+    if(data.searchValue){
+      const re = RegExp(`${data?.searchValue?.replace(/[+-.]/g, "\\$&")}`, "i");
+      const nameQuery = new Parse.Query(Company).matches('name', re);
+      const addressQuery = new Parse.Query(Company).matches('address', re);
+      const emailQuery = new Parse.Query(Company).matches('contactInfo.email', re);
+      const phoneQuery = new Parse.Query(Company).matches('contactInfo.phone', re);
+      query = Parse.Query.or(nameQuery, addressQuery, emailQuery, phoneQuery);
+    }
+    if (data.sortField) {
+      if (data.sortOrder === 'asc') {
+        query.ascending(data.sortField);
+      } else {
+        query.descending(data.sortField);
+      }
+    } else {
+      query.descending('createdAt');
+    }
+    query
+    .skip(data.skip)
+    .limit(data.limit)
+    .include([
+      'name',
+      'address',
+      'contactInfo',
+      'img'
+    ])
+    if(data.withCount){
+      query.withCount(true)
+    }
+    return await query.find({sessionToken})
+});
+
+
+Parse.Cloud.define("updateCompany",async (request)=>{
+  const {companyId, name, address, contactInfo, img, overDueDays,currency} = request.params;
+  const sessionToken = request.user?.getSessionToken();
+  let overDueDayChanged = false
+  const companyQuery = new Parse.Query(Company);
+  companyQuery.equalTo("objectId", companyId);
+  const company = await companyQuery.first({sessionToken});
+  if(company){
+    company.name = name;
+    company.address = address;
+    company.contactInfo = contactInfo;
+    company.img = img;
+    company.currency = currency;
+    await company.save(null, {sessionToken});
+    return company;
+  }
+  throw new Error("Company not found");
+})

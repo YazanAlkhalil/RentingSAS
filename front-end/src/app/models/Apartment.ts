@@ -3,7 +3,6 @@ import Parse from 'parse';
 export class Apartment extends Parse.Object {
   constructor() {
     super('Apartment');
-    this.set('imgs',[])
   }
   get building(): Building {
     return this.get('building');
@@ -28,6 +27,12 @@ export class Apartment extends Parse.Object {
   }
   set floor(value: number) {
     this.set('floor', value);
+  }
+  set owner(value:string){
+    this.set('owner',value)
+  }
+  get owner():string{
+    return this.get('owner')
   }
   get size(): number {
     return this.get('size');
@@ -65,11 +70,21 @@ export class Apartment extends Parse.Object {
   set isFurnished(value: boolean) {
     this.set('isFurnished', value);
   }
+
+  //status: out of service, occupied, vacant
   get status(): string {
     return this.get('status');
   }
   set status(value: string) {
     this.set('status', value);
+  }
+
+  //type: Residential,Commercial
+  get type():string{
+    return this.get('type')
+  }
+  set type(value:string){
+    this.set('type',value)
   }
   get description(): string {
     return this.get('description');
@@ -82,6 +97,40 @@ export class Apartment extends Parse.Object {
   }
   set imgs(value: Parse.File[]) {
     this.set('imgs', value);
+  }
+  get isArchived(): boolean {
+    return this.get('isArchived');
+  }
+  set isArchived(value: boolean) {
+    this.set('isArchived', value);
+  }
+
+  set paymentType(value:string){
+    this.set('paymentType',value)
+  }
+  get paymentType():string{
+    return this.get('paymentType')
+  }
+
+  set frequency(value:string){
+    this.set('frequency',value)
+  }
+  get frequency():string{
+    return this.get('frequency')
+  }
+
+  set lastOccupiedDate(value:Date){
+    this.set('lastOccupiedDate',value)
+  }
+  get lastOccupiedDate():Date{
+    return this.get('lastOccupiedDate')
+  }
+
+  set statusCode(value:string){
+    this.set('statusCode',value)
+  }
+  get statusCode():string{
+    return this.get('statusCode')
   }
 }
 Parse.Object.registerSubclass('Apartment',Apartment)

@@ -4,14 +4,17 @@ import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { InputTextModule } from 'primeng/inputtext';
 import { User } from '../../models/_User';
-import Parse from 'parse';
 import { FormsModule } from '@angular/forms';
 import { AvatarModule } from 'primeng/avatar';
+import Parse from 'parse';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 @Component({
     selector: 'app-users',
     templateUrl: './users.component.html',
     standalone: true,
-    imports: [CommonModule,TableModule,ButtonModule,FormsModule ,AvatarModule,InputTextModule],
+    imports: [CommonModule,TableModule,ButtonModule,FormsModule ,AvatarModule,InputTextModule,
+        ProgressSpinnerModule
+    ],
     providers: [],
     styles: [
     `
@@ -126,26 +129,13 @@ export class UsersComponent implements OnInit {
 
     constructor(private cd: ChangeDetectorRef) {}
 
-    ngOnInit() {
-        console.log(Parse.User.current());
-        
-        const company = Parse.User.current()?.attributes['company'];
-        console.log(company);
-        
-        if(!company) return;
-        const query = new Parse.Query(User);
-        query.equalTo('company', company);
-        
-        query.find().then((users) => {
-          
-          this.users = users;
-          this.loading = false;
-          console.log(users,'sss')
-          this.cd.detectChanges();
-        }).catch((error) => {
-          console.log(error);
-        });
-        
+    ngOnInit() {        
+        const companyId = Parse.User.current()?.attributes['company'].id;
+        Parse.Cloud.run('getUsers', {companyId}).then((users) => {
+            this.users = users;
+            this.loading = false;
+            this.cd.detectChanges();
+        })
     }
 
     // Remove unused methods

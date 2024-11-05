@@ -18,23 +18,25 @@
       />
     </ng-template>
   </p-toolbar>
-
+  <div class="flex justify-content-center align-items-center" *ngIf="loading">
+    <p-progressSpinner ariaLabel="loading" />
+  </div>
   <p-table
     #dt
+    *ngIf="!loading"
     [value]="buildings"
     [rows]="10"
-    [globalFilterFields]="[
-      'name',
-      'location.longitude',
-      'location.latitude',
-      'address',
-    ]"
     [tableStyle]="{ 'min-width': '75rem' }"
     [(selection)]="selectedBuildings"
     [rowHover]="true"
     dataKey="id"
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
     [showCurrentPageReport]="true"
+    (onSort)="onSort($event)"
+    [sortMode]="'single'"
+    [lazy]="true"
+    [sortField]="data.sortField"
+    [sortOrder]="data.sortOrder"
   >
     <ng-template pTemplate="caption">
       <div class="flex align-items-center justify-content-between">
@@ -42,9 +44,9 @@
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
           <input
+            #searchInput
             pInputText
             type="text"
-            (input)="dt.filterGlobal($any($event.target).value, 'contains')"
             placeholder="Search..."
           />
         </span>
@@ -56,15 +58,18 @@
         <th style="width: 4rem">
           <p-tableHeaderCheckbox />
         </th>
-        <th pSortableColumn="name" class="text-2xl" >Name <p-sortIcon field="name" /></th>
-        <th class="text-2xl">
-          Address
+        <th pSortableColumn="name" class="text-2xl">
+          Name <p-sortIcon field="name" />
+        </th>
+        <th pSortableColumn="address" class="text-2xl">
+          Address <p-sortIcon field="address" />
         </th>
         <th class="text-2xl">Location</th>
         <th class="text-2xl">Image</th>
         <th class="text-2xl">Processes</th>
-      </tr> </ng-template
-    >0.0
+      </tr>
+    </ng-template>
+
     <ng-template pTemplate="body" let-building>
       <tr class="text-2xl">
         <td>
@@ -114,7 +119,7 @@
 
     <ng-template pTemplate="summary">
       <div class="flex align-items-center justify-content-between">
-        In total there are {{ buildings ? buildings.length : 0 }} buildings.
+        In total there are {{ count ? count : 0 }} buildings.
       </div>
     </ng-template>
   </p-table>
@@ -245,7 +250,7 @@
 </div>
 <p-paginator 
     (onPageChange)="onPageChange($event)" 
-    [first]="skip"
-    [rows]="limit" 
+    [first]="data.pageIndex"
+    [rows]="data.pageSize" 
     [totalRecords]="count" 
     [rowsPerPageOptions]="[10, 25, 50,100]" />

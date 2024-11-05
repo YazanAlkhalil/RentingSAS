@@ -22,7 +22,6 @@ Parse.Cloud.afterSave(Parse.User, async (request) => {
       const companyRole = await companyRoleQuery.first({sessionToken});
   
       if (companyRole) {
-          console.log('========================================================')
           companyRole.getUsers().add(user);
           await companyRole.save(null, {sessionToken});
           const acl = new Parse.ACL();

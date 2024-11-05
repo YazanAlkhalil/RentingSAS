@@ -29,14 +29,22 @@ export class Company extends Parse.Object {
   set contactInfo(value: ContactInfo) {
     this.set('contactInfo', value);
   }
-
-  get img(): string {
+  get img(): Parse.File {
     return this.get('img');
   }
 
-  set img(value: string) {
+  set img(value: Parse.File) {
     this.set('img', value);
   }
+
+  get currency(): string {
+    return this.get('currency');
+  }
+
+  set currency(value: string) {
+    this.set('currency', value);
+  }
+
 }
 
 Parse.Object.registerSubclass('Company', Company);

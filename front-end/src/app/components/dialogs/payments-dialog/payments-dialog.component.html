@@ -1,0 +1,110 @@
+<p-toolbar styleClass="mb-4 gap-2">
+    <ng-template pTemplate="left">
+        <p-button severity="success" label="New" icon="pi pi-plus" class="mx-2" (onClick)="openNewPayment()" />
+    </ng-template>
+</p-toolbar>
+<p-table #pt [value]="payments" [rows]="10" [paginator]="true"
+    [globalFilterFields]="['name', 'country.name', 'representative.name', 'status']"
+    [tableStyle]="{ 'min-width': '75rem' }" [rowHover]="true" dataKey="id"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [showCurrentPageReport]="true">
+    <ng-template pTemplate="caption">
+        <div class="flex align-items-center justify-content-end">
+            <span class="p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" (input)="pt.filterGlobal($any($event.target).value, 'contains')"
+                    placeholder="Search..." />
+            </span>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+        <tr>
+            <th pSortableColumn="dueDate">Due Date <p-sortIcon field="dueDate"></p-sortIcon></th>
+            <th pSortableColumn="amount">Amount <p-sortIcon field="amount"></p-sortIcon></th>
+            <th pSortableColumn="paidAmount">Paid Amount <p-sortIcon field="paidAmount"></p-sortIcon></th>
+            <th pSortableColumn="status">Status <p-sortIcon field="status"></p-sortIcon></th>
+            <th pSortableColumn="paidDate">Paid Date <p-sortIcon field="paidDate"></p-sortIcon></th>
+            <th>Transaction ID</th>
+            <th>Payment Method</th>
+            <th>Actions</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-payment>
+        <tr>
+            <td>{{ payment.dueDate | date:'dd/MM/yyyy' }}</td>
+            <td>{{ payment.amount }}</td>
+            <td>{{ payment.paidAmount }}</td>
+            <td>{{ payment.status }}</td>
+            <td>{{ payment.paidDate ? (payment.paidDate | date:'dd/MM/yyyy') : 'Not Paid' }}</td>
+            <td>{{payment.paymentMethod}}</td>
+            <td>{{payment.transactionId}}</td>
+            <td>
+                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                    (onClick)="deletePayment(payment)" />
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+
+<p-dialog [(visible)]="paymentsDialog" [style]="{ width: '450px' }"
+        [header]="'Payment ' + (payment.attributes['dueDate'] ? (payment.attributes['dueDate'] | date: 'MM/dd/yyyy') : '')"
+        [modal]="true" styleClass="p-fluid">
+        <ng-template pTemplate="content">
+            <div class="grid">
+                <div class="col-12 md:col-6">
+                    <div class="field">
+                        <label for="dueDate">Due Date</label>
+                        <p-calendar appendTo="body" class="w-full" id="dueDate" [(ngModel)]="payment.dueDate"
+                            [required]="true"></p-calendar>
+                    </div>
+                </div>
+                <div class="col-12 md:col-6">
+                    <div class="field">
+                        <label for="Amount">Amount</label>
+                        <p-inputNumber id="Amount" [(ngModel)]="payment.amount" [required]="true"
+                            styleClass="w-full"></p-inputNumber>
+                    </div>
+                </div>
+                <div class="col-12 md:col-6">
+                    <div class="field">
+                        <label for="Status">Status</label>
+                        <p-dropdown appendTo="body" id="Status" [(ngModel)]="payment.status" [options]="paymentStatusOptions"
+                            [required]="true" placeholder="Select a status" styleClass="w-full"
+                            (onChange)="onPaymentStatusChange()"></p-dropdown>
+                    </div>
+                </div>
+                <div class="col-12 md:col-6">
+                    <div class="field">
+                        <label for="PaidAmount">Paid Amount</label>
+                        <p-inputNumber id="PaidAmount" [(ngModel)]="payment.paidAmount" [required]="true"
+                            styleClass="w-full"></p-inputNumber>
+                    </div>
+                </div>
+                <div class="col-12 md:col-6 ">
+                    <div class="field">
+                        <label for="paidDate">Paid Date</label>
+                        <p-calendar appendTo="body" id="paidDate" [(ngModel)]="payment.paidDate" [required]="true"
+                            styleClass="w-full"></p-calendar>
+                    </div>
+                </div>
+                <div class="col-12 md:col-6 ">
+                    <div class="field">
+                        <label for="paymentMethod">Payment Method</label>
+                        <p-dropdown appendTo="body" id="paymentMethod" [(ngModel)]="payment.paymentMethod" [options]="paymentMethods"
+                            placeholder="Select a payment method" styleClass="w-full"></p-dropdown>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="field">
+                        <label for="transactionId">Transaction ID</label>
+                        <input type="text" pInputText id="transactionId" [(ngModel)]="payment.transactionId" styleClass="w-full"/>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <p-button label="Cancel" icon="pi pi-times" [text]="true" severity="secondary"
+                (onClick)="hidePaymentsDialog()" />
+            <p-button label="Save" icon="pi pi-check" severity="primary" (onClick)="savePayment()" />
+        </ng-template>
+    </p-dialog>

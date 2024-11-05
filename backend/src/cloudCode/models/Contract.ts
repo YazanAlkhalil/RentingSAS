@@ -1,4 +1,5 @@
 import {Apartment} from './Apartment';
+import { Client } from './Client';
 import {Payment} from './Interfaces/Payment';
 
 export class Contract extends Parse.Object {
@@ -38,6 +39,7 @@ export class Contract extends Parse.Object {
     this.set('rentAmount', value);
   }
 
+  //paymentFrequency: monthly, quarterly,semiannually,annually
   get paymentFrequency(): string {
     return this.get('paymentFrequency');
   }
@@ -52,14 +54,6 @@ export class Contract extends Parse.Object {
 
   set balance(value: number) {
     this.set('balance', value);
-  }
-
-  get deposit(): string {
-    return this.get('deposit');
-  }
-
-  set deposit(value: string) {
-    this.set('deposit', value);
   }
 
   get isExpired(): boolean {
@@ -78,16 +72,12 @@ export class Contract extends Parse.Object {
     this.set('additionalInfo', value);
   }
   
-  get payments(): Payment[] {
-    return this.get('payments');
+  //type: Advance,Postpaid
+  set type(value:string){
+    this.set('type',value)
   }
-
-  set payments(value: Payment[]) {
-    this.set('payments', value);
-  }
-
-  get maintenanceTerms(): string {
-    return this.get('maintenanceTerms');
+  get type():string{
+    return this.get('type')
   }
 
   set maintenanceTerms(value: string) {
@@ -108,6 +98,28 @@ export class Contract extends Parse.Object {
 
   set utilitiesToPay(value: string[]) {
     this.set('utilitiesToPay', value);
+  }
+
+  get client(): Client {
+    return this.get('client');
+  } 
+
+  set client(value: Client) {
+    this.set('client', value);
+  }
+
+  get isArchived(): boolean {
+    return this.get('isArchived');
+  }
+
+  set isArchived(value: boolean) {
+    this.set('isArchived', value);
+  }
+  set overDuePeriodDays(value:number){
+    this.set('overDuePeriodDays',value)
+  }
+  get overDuePeriodDays():number{
+    return this.get('overDuePeriodDays')
   }
 }
 

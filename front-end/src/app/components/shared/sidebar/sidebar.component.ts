@@ -51,6 +51,12 @@ export class SidebarComponent implements OnInit {
   loading = false;
   menuItems: CustomMenuItem[] = [
     {
+      id:'payments',
+      title:this.translateService.instant('payments'),
+      icon:'pi pi-money-bill',
+      routerLink:'/main/payments',
+    },
+    {
       id:'contracts',
       title:this.translateService.instant('contracts'),
       icon:'pi pi-file-pdf',

@@ -31,6 +31,7 @@ async function main(): Promise<void> {
     publicServerURL: process.env.publicServerURL,
     mountPath: '/api',
     allowClientClassCreation: true,
+
   };
 
   const api = new ParseServer(config);

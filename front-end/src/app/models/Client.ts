@@ -1,16 +1,9 @@
 import { Company } from './Company';
-import {Contract} from './Contract';
-import {ContactInfo} from './Interfaces/ContactInfo';
+import Parse from 'parse';
 
 export class Client extends Parse.Object {
   constructor() {
     super('Client');
-  }
-  get contract(): Contract {
-    return this.get('contract');
-  }
-  set contract(value: Contract) {
-    this.set('contract', value);
   }
   get company(): Company {
     return this.get('company');
@@ -24,17 +17,40 @@ export class Client extends Parse.Object {
   set name(value: string) {
     this.set('name', value);
   }
-  get contactInfo(): ContactInfo {
-    return this.get('contactInfo');
+  get phone(): number {
+    return this.get('phone');
   }
-  set contactInfo(value: ContactInfo) {
-    this.set('contactInfo', value);
+  set phone(value: number) {
+    this.set('phone', value);
   }
   get img(): Parse.File {
     return this.get('img');
   }
   set img(value: Parse.File) {
     this.set('img', value);
+  }
+
+  //status: Active,pending,Blocked,Former
+
+  set status(value:string){
+    this.set('status',value)
+  }
+  get status():string{
+    return this.get('status')
+  }
+
+  set statusCode(value:string){
+    this.set('statusCode',value)
+  }
+  get statusCode():string{
+    return this.get('statusCode')
+  }
+
+  set isArchived(value:boolean){
+    this.set('isArchived',value)
+  }
+  get isArchived():boolean{
+    return this.get('isArchived')
   }
 }
 Parse.Object.registerSubclass('Client' , Client)

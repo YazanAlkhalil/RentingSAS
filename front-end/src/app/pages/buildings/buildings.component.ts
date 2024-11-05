@@ -3,8 +3,10 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
+  ViewChild,
 } from "@angular/core";
-import { FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { TranslateModule } from "@ngx-translate/core";
 import { ButtonModule } from "primeng/button";
 import { InputTextModule } from "primeng/inputtext";
@@ -30,6 +32,8 @@ import {
   UploadResponse,
 } from "ngx-image-compress";
 import { ImageCropperDialogComponent } from "./image-cropper-dialog/image-cropper-dialog.component";
+import { debounceTime, fromEvent, Subscription } from "rxjs";
+import { ProgressSpinnerModule } from "primeng/progressspinner";
 
 @Component({
   selector: "app-buildings",
@@ -54,6 +58,7 @@ import { ImageCropperDialogComponent } from "./image-cropper-dialog/image-croppe
     FileUploadModule,
     ImageModule,
     PaginatorModule,
+    ProgressSpinnerModule
   ],
   providers: [MessageService, ConfirmationService, DialogService],
   templateUrl: "./buildings.component.html",
@@ -71,20 +76,35 @@ export class BuildingsComponent {
   statuses!: any[];
   selectedBuildings!: Building[] | null;
   data: {
-    skip: number;
-    limit: number;
+    pageSize: number;
+    pageIndex: number;
     searchValue: string;
-    sortField: string;
+    sortField?: string;
+    sortOrder: number;
     withCount: boolean;
   } = {
-    skip: 0,
-    limit: 5,
-    searchValue: "",
-    sortField: "name",
+    pageSize: 10,
+    pageIndex: 0,
     withCount: true,
+    searchValue: '',
+    sortField: 'createdAt',
+    sortOrder: 1
   };
   count: number = 0
   dataImage: string | null = null;
+  heroImages = [
+    {
+      name:'hero-1',
+      img: '../../../assets/images/def1.png',
+    },
+    {
+      name:'hero-2',
+      img: '../../../assets/images/def1.png',
+    },
+  ]
+  @ViewChild('searchInput') searchInput!: ElementRef;
+  searchSubscription!: Subscription;
+  loading = true;
 
   constructor(
     private buildingService: BuildingService,
@@ -97,7 +117,9 @@ export class BuildingsComponent {
   ) {}
   private imageCropperDialogComponentRef: DynamicDialogRef | undefined;
 
-  getBuildings() : Building[]{
+  getBuildings(){
+    this.loading = true;
+    this.cd.detectChanges();
     this.buildingService
       .getBuildings(this.data)
       .then((data: Building[] | {count: number, results: Building[]}) => {
@@ -109,11 +131,9 @@ export class BuildingsComponent {
           this.buildings = data;
           this.buildingsName = data.map((x: Building) => x.name);
         }
+        this.loading = false;
         this.cd.detectChanges();
-        console.log(this.buildings,'bds');
-        console.log(this.buildingsName,'names');
       });
-      return this.buildings
   }
   ngOnInit() {
     this.getBuildings();
@@ -124,14 +144,13 @@ export class BuildingsComponent {
     this.building.company = this.authService.getCurrentUser()?.get('company')
     this.building.location.longitude = ''
     this.building.location.latitude = ''
-    console.log(this.building,'bb');
     this.submitted = false;
     this.buildingDialog = true;
   }
 
   onPageChange(event: any) {
-    this.skip = event.first;
-    this.limit = event.rows;
+    this.data.pageIndex = event.first;
+    this.data.pageSize = event.rows;
     this.getBuildings();
   }
 
@@ -147,9 +166,10 @@ export class BuildingsComponent {
           (val) => !this.selectedBuildings?.includes(val)
         );
         this.selectedBuildings!.forEach((x) =>
-          this.buildingService.deleteBuilding(x)
+          this.buildingService.deleteBuilding(x.id)
         );
         this.selectedBuildings = null;
+        this.getBuildings()
         this.messageService.add({
           severity: "success",
           summary: "Successful",
@@ -175,7 +195,7 @@ export class BuildingsComponent {
       acceptButtonStyleClass: "p-button-danger",
       accept: async () => {
         try {
-          await this.buildingService.deleteBuilding(building);
+          await this.buildingService.deleteBuilding(building.id);
           this.getBuildings();
           this.messageService.add({
             severity: "success",
@@ -207,7 +227,7 @@ export class BuildingsComponent {
     this.submitted = true;
     if (this.building.name?.trim()) {
       if (this.building.id) {
-        await this.building.save();
+        await this.buildingService.updateBuilding(this.building);
         this.messageService.add({
           severity: "success",
           summary: "Successful",
@@ -275,6 +295,7 @@ export class BuildingsComponent {
       );
       this.imageCropperDialogComponentRef.onClose.subscribe(async (img) => {
         if (img) {
+          console.log(img,'img');
           this.building.img = img;
           this.dataImage = "data:image/jpeg;base64," + img._data;
           this.cd.detectChanges();
@@ -288,6 +309,28 @@ export class BuildingsComponent {
   removeProfilePic() {
     this.building.unset("img");
     this.dataImage = "";
+    this.cd.detectChanges();
+  }
+
+  ngAfterViewInit() {
+    this.searchSetup();
+  }
+
+  searchSetup() {
+    this.searchSubscription = fromEvent(this.searchInput.nativeElement, "keyup")
+      .pipe(debounceTime(500))
+      .subscribe((event: any) => {
+        const target = event.target as HTMLInputElement;
+        this.data.searchValue = target.value;
+        this.getBuildings();
+      });
+  }
+
+  onSort(event: any) {
+    console.log(event,'event');
+    this.data.sortField = event.field;
+    this.data.sortOrder = event.order;
+    this.getBuildings();
     this.cd.detectChanges();
   }
 }

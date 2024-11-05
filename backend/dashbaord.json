@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "serverURL": "http://localhost:1337/api",
+      "serverURL": "http://localhost:1337/parse",
       "appId": "Renting",
       "masterKey": "9ee3136b956a31a25075a4d0d220552081b386f22b4a04a620fe1090b15004eb",
       "appName": "Renting",

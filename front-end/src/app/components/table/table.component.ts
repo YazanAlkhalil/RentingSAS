@@ -82,6 +82,8 @@ export class TableComponent implements OnInit {
   }
 
   getCompanies() {
+
+    
     this.adminService.getCompanies({
       searchValue: this.searchValue,
       withCount: true,
@@ -92,6 +94,7 @@ export class TableComponent implements OnInit {
     }).then((data: Company[] | { results: Company[]; count: number }) => {
       if ('results' in data) {
         this.companies = data.results;
+        console.log(this.companies)
         this.count = data.count;
       }
       else{
@@ -205,7 +208,6 @@ export class TableComponent implements OnInit {
     if (this.company.name?.trim()) {
       if (this.company.id) {
         // Update existing company
-        this.companies[this.findIndexById(this.company.id)] = this.company;
         await this.company.save()
         this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Company Updated', life: 3000 });
       } else {
@@ -232,28 +234,6 @@ export class TableComponent implements OnInit {
       this.companyDialog = false;
       this.company = new Company();
     }
-  }
-
-  findIndexById(id: string): number {
-    let index = -1;
-    for (let i = 0; i < this.companies.length; i++) {
-      if (this.companies[i].id === id) {
-        index = i;
-        break;
-      }
-    }
-    return index;
-  }
-
-  getSeverity(status: string) {
-    // switch (status) {
-    //     case 'INSTOCK':
-    //         return 'success';
-    //     case 'LOWSTOCK':
-    //         return 'warning';
-    //     case 'OUTOFSTOCK':
-    //         return 'danger';
-    // }
   }
 
   onImageUpload(event: any) {    
@@ -328,28 +308,35 @@ export class TableComponent implements OnInit {
   }
 
   editUser(user: User) {
-    this.newUser.set('username', user.attributes["username"])
-    this.newUser.set('password', user.attributes["password"])
-    this.newUser.set('contactInfo', user.attributes["contactInfo"])
-    this.newUser.set('img', user.attributes["img"])
+    this.newUser.username = user.username
+    this.newUser.password = user.password
+    this.newUser.contactInfo = user.contactInfo
+    this.newUser.img = user.img
     this.newUser.id = user.id
-    // this.newUser = user;
     console.log(this.newUser);
     
     this.addUserDialog = true;
   }
 
   deleteUser(user: User) {
-
-    this.adminService.deleteUser(user)
-      .then(() => {
-        this.getUsers();
-      });
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to delete ' + user.attributes["username"] + '?',
+      header: 'Confirm',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.adminService.deleteUser(user)
+          .then(() => {
+            this.getUsers();
+          });
+      }
+    });
   }
 
   onUserImageUpload(event: any) {
     const file = event.files[0];
-    const parseFile = new Parse.File(file.name, file);
+    const uniqueFileName = `${Date.now()}`;
+    const parseFile = new Parse.File(uniqueFileName, file);
     this.newUser.img = parseFile;
   }
 }

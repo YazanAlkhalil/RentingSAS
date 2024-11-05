@@ -45,6 +45,14 @@ export class Building extends Parse.Object {
     this.set('img', value);
   }
 
+  get isArchived(): boolean {
+    return this.get('isArchived');
+  }
+
+  set isArchived(value: boolean) {
+    this.set('isArchived', value);
+  }
+
 }
 
 Parse.Object.registerSubclass('Building', Building);

@@ -44,6 +44,12 @@ export const routes: Routes = [
           ),
           children:[
             {
+              path:"payments",
+              loadComponent: () => 
+                import('./pages/payments/payments.component')
+              .then( (m) => m.PaymentsComponent )
+            },
+            {
               path:"",
               redirectTo: "buildings",
               pathMatch: "full"

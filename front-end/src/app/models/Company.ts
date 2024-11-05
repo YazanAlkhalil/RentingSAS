@@ -4,8 +4,7 @@ import  Parse  from "parse";
 export class Company extends Parse.Object {
   constructor() {
     super('Company');
-    // Initialize contactInfo with an object that conforms to the ContactInfo interface
-    this.set('contactInfo', { phone: '', email: '' });
+    this.contactInfo = {email: '', phone: ''}
   }
 
   get name(): string {
@@ -32,12 +31,22 @@ export class Company extends Parse.Object {
     this.set('contactInfo', value);
   }
 
+
+  
   get img(): Parse.File {
     return this.get('img');
   }
 
   set img(value: Parse.File) {
     this.set('img', value);
+  }
+
+  get currency(): string {
+    return this.get('currency');
+  }
+
+  set currency(value: string) {
+    this.set('currency', value);
   }
 }
 
