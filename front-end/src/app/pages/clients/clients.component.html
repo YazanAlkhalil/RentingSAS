@@ -7,7 +7,7 @@
                 [disabled]="!selectedClients || !selectedClients.length" />
         </ng-template>
     </p-toolbar>
-    <div class="flex justify-content-center align-items-center" *ngIf="loading"></div>
+    <div class="flex justify-content-center align-items-center" *ngIf="loading">
         <p-progressSpinner ariaLabel="loading" />
     </div>
     <p-table #dt [value]="clients" [rows]="10"
